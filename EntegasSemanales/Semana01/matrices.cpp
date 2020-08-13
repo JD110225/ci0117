@@ -1,5 +1,5 @@
+#include <time.h>
 #include <iostream>
-#include <time.h> 
 using namespace std;
 int* getColumna(int** m, int size,int num){
     int* col = new int[size];
@@ -66,10 +66,13 @@ int main()
     cin >> size;
     int** m1 = generarMatrizAleatoria(size);
     int** m2 = generarMatrizAleatoria(size);
-    cout << "M1: "<<endl;
-    displayMatrix(m1, size);
-    cout << "M2: "<<endl;
-    displayMatrix(m2, size);
-    cout << "Matriz resultado: " << endl;
-    displayMatrix(matrixMultiplication(m1, m2, size),size);
+    clock_t tStart = clock();
+    matrixMultiplication(m1, m2, size);
+    printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC); //stack overflow:https://stackoverflow.com/questions/876901/calculating-execution-time-in-c 
+    // cout << "M1: "<<endl;
+    // displayMatrix(m1, size);
+    // cout << "M2: "<<endl;
+    // displayMatrix(m2, size);
+    // cout << "Matriz resultado: " << endl;
+    // displayMatrix(matrixMultiplication(m1, m2, size),size);
 }

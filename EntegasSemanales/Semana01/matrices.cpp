@@ -1,12 +1,6 @@
 #include <iostream>
 #include <time.h> 
 using namespace std;
-void displayArray(int* arr, int size) {
-    for (int i= 0; i<size; ++i){
-        cout << arr[i] << " ";
-    }
-    cout << "\n";
-}
 int* getColumna(int** m, int size,int num){
     int* col = new int[size];
     for (int i=0;i<size;++i){

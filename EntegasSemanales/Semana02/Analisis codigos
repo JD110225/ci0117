@@ -1,0 +1,12 @@
+Programa:sumaUno.c
+
+Serial Version: Valor acumulado por 100 procesos es 100,000 en 0.229 ms 
+Fork Version: Valor acumulado por 100 procesos es 0 en 379.36100 ms
+
+Analisis: 
+	La version serial funciona tal y como se espera ya que se le suma uno al total inicial(0) un total de 1000 veces por cada proceso que el usuario especifique y como en el caso default son 100 procesos, el total corresponde a 1000*100=100,000
+	En cuanto a la version concurrente, el problema surge debido a que no se esta haciendo uso de memoria compartida, el metodo de AddOne funciona correctamente pero la variable "total" para un proceso padre no es la misma que para el proceso hijo, de manera que aunque un proceso hijo haga la suma, no cambia la variable "total" del proceso padre.
+	
+Programa: PiPorSeries.c
+Analisis: La idea detras de este codigo es utilizar diferentes procesos para calcular los terminos de pi,a cada proceso le corresponde calcular los terminos en un rango determinado(por ejemplo del termino 100,000-200,000) y posterioremente en un array se van almacenando los resultados obtenidos por cada proceso y al final se suman, de manera que cuando termine la ejecucion de todos los procesos, se obtendria una aproximacion bastante precisa de Pi, sin embargo nuevamente este codigo no implemente memoria compartida de manera que los resultados que son obtenidos en un proceso no inciden del todo en los demas, Debido a esto el resultado final es:
+ "Valor calculado de Pi es 0 con 1000000 terminos", el cual evidentemente es erroneo. 

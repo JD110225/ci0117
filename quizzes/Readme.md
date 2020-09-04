@@ -1,1 +1,1 @@
-Quizzes 
+Descargar imágenes para verlas correctamente

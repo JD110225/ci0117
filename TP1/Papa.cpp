@@ -1,11 +1,3 @@
-/*
- *  Ejemplo base para el problema de la ronda
- *
- *  CI-0117 Programacion concurrente y paralela
- *  Fecha: 2020/Ago/24
- *
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,12 +13,17 @@
 #include "Semaforo.h"
 #include <iostream>
 using namespace std;
-#define MaxParticipantes 5
-#define valorDefault 10
+#define MaxParticipantes 5 //Valor predeterminado para el numero de participantes
+#define valorDefault 10 //Valor predeterminado de la Papa
 // Variable global para el numero de participantes
 int participantes = MaxParticipantes;
 int valorPapa=valorDefault;
-int* perdedores=new int[participantes];
+/*
+   El i-esimo elemento del arreglo perdedores tendra valor 1
+   si el proceso "i" exploto la papa y 0 en caso contrario,
+   ademas es un segmento de memoria compartida.
+*/
+bool* perdedores=new bool[participantes];
 
 /*
  *  Estructura para el paso de mensajes entre procesos
@@ -34,11 +31,9 @@ int* perdedores=new int[participantes];
 struct msgbuff1 {
    long mtype;
    int valorPapa;
-   // otros elementos
 };
 Buzon2 b;
 struct msgbuff1 receive;
-int st;
 
 /*
  *  Aplica las reglas de Collatz al valor de la papa
@@ -55,6 +50,7 @@ int cambiarPapa( int papa ) {
    return papa;
 
 }
+//Si hay n participantes, este metodo verifica si n-1 de ellos ya explotaron la papa(perdieron)
 bool endOfGame(){
    bool fin=false;
    int counter=0;
@@ -67,38 +63,44 @@ bool endOfGame(){
    }
    return fin;   
 }
-
-void showArray(int* arr,int size){
-   for(int i=0;i<size;++i){
-      cout<<arr[i]<<" ";
+// Cuando ya acabo el juego, se busca aquel proceso que nunca exploto la papa(el ganador).
+int getWinner(){
+   int winnerId=-1;
+   if(endOfGame()){
+      for(int i=0;i<participantes;++i){
+         if(perdedores[i]==0){
+            winnerId=i;
+            break;
+         }
+      }
    }
-   cout<<"\n";
+   return winnerId;
 }
-int participante( int id ,Semaforo s) {
-    int nuevaPapa=cambiarPapa(receive.valorPapa);
-    if(nuevaPapa==1){
-        perdedores[id]=1;
-        //showArray(perdedores,10);
-        printf("\n\t\tProceso %d EXPLOTO la papa\n\n",id);
-        srand (time(NULL));
-        nuevaPapa=rand()%100 +2; //+2 para que la papa no comience siendo uno.
-        printf("Nuevo valor random de la papa: %d\n",nuevaPapa);
-        b.Enviar(3,nuevaPapa);
+/*
+   Este metodo realiza todas las acciones respectivas de un participante cuando recibe una papa.
+*/
+int participante( int id ,Semaforo s,bool procesoPasivo) {
+    int nuevaPapa;
+    if(!procesoPasivo){
+      nuevaPapa=cambiarPapa(receive.valorPapa);
+      if(nuevaPapa==1){
+         perdedores[id]=1;
+         //showArray(perdedores,10);
+         printf("\n\t\tProceso %d EXPLOTO la papa\n\n",id);
+         srand (getpid());
+         nuevaPapa=rand()%10 +2; //+2 para que la papa no comience siendo uno.
+         printf("Nuevo valor random de la papa: %d\n",nuevaPapa);
+      }
     }
-    else{
-        b.Enviar(3,nuevaPapa);
-    }
-//    _exit( 0 );	// Everything OK
+   else{
+      nuevaPapa=receive.valorPapa;
+   }
+   b.Enviar(3,nuevaPapa);
     s.signal();
     exit(0);
-    return 0;
-
 }
 int main( int argc, char ** argv ) {
-    Semaforo s(0);
-    bool end=false;
-    // struct msgbuff1 r;
-   //  int buzon, id, i, j, resultado;
+    Semaforo s(0); //synchronization.
     int  i, j, resultado;
 
     if ( argc > 1 ) {
@@ -110,38 +112,37 @@ int main( int argc, char ** argv ) {
    }
     b.Enviar(3,valorPapa);
    srandom( getpid() );
-    printf("Valor papa main: %d\n",valorPapa);
    printf( "Creando una ronda de %d participantes\n", participantes );
    for(int i=0;i<participantes;++i){
       perdedores[i]=0;
    }
    int id= shmget( 123456, 1024, 0700 | IPC_CREAT );
-   perdedores=(int*)shmat( id, NULL, 0 );	
+   perdedores=(bool*)shmat( id, NULL, 0 );	
+   bool end=false; //Si el juego ya finalizo.
    while(!end){
-      //ese i=1...ARE YOU GOOD FRANCISCO????
-      for ( i = 1; i <= participantes; i++ ) {
-         if(perdedores[i]!=1){
-            if ( ! fork() ) {
-               b.Recibir(&receive,3);
-               printf("Proceso %d recibio papa: %d\n",i,receive.valorPapa);
-               participante( i ,s);
+      for ( i = 0; i < participantes; i++ ) {
+         if ( ! fork() ) {
+            b.Recibir(&receive,3);
+            bool esPasivo=perdedores[i]==1;
+            if(esPasivo){
+               printf("Proceso %d recibio papa: %d (es un participante pasivo)\n",i,receive.valorPapa);
             }
             else{
-               s.wait();
+               printf("Proceso %d recibio papa: %d\n",i,receive.valorPapa);             
             }
+            participante( i ,s,esPasivo);
          }
+         else{
+            s.wait();
+         }
+         
       }
-      showArray(perdedores,participantes);
       end=endOfGame();
    }
-
-   shmdt( perdedores );		// Se "despega" del area compartida
+   int winnerId=getWinner();
+   printf("El proceso ganador es: %d!!!\n",winnerId);
+   shmdt( perdedores );		
    shmctl( id, IPC_RMID, NULL );
-
-// El programa principal decidirá cual es el primer participante en arrancar y el valor inicial de la papa
-
-
-// Espera que los participantes finalicen
    for ( i = 1; i <= participantes; i++ ) {
       j = wait( &resultado );
    }

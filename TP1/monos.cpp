@@ -21,8 +21,8 @@
 #include <sys/shm.h>
 #include "SemaforoArray.h"
 #define MONOS 10		// Cantidad de monos a crear en la manada
-#define MaxEnCuerda 3		// Capacidad máxima de la cuerda
-#define J 5	// Cantidad permitada antes de cambiar la dirección
+#define MaxEnCuerda 1		// Capacidad máxima de la cuerda
+#define J 3	// Cantidad permitada antes de cambiar la dirección
 #define DirIzqADer 1		// El mono cruza de izquierda a derecha
 #define DirDerAIzq 2		// El mono cruza de derecha a izquierda
 enum Direccion { IzqDer, DerIzq };
@@ -31,6 +31,8 @@ struct compartido {
     int cantidadEnCuerda=0;
     int cantidadPasados=0;
     bool empty=1;
+    int leftCounter=0;
+    int rightCounter=0;
 };
 struct compartido * sharedData;
 SemaforoArray s(2);
@@ -53,7 +55,6 @@ int mono( int id, int dir ) {
         sharedData->dir=dir;
         sharedData->empty=0;
     }
-   printf("Proceso %d: monos caminando desde %s: %d\n",id,(sharedData->dir)==0?" Izq ":" Der ",sharedData->cantidadEnCuerda);
    switch ( dir  ) {
       case IzqDer:
          printf( "Mono %2d quiere cruzar de izquierda a derecha\n", id );
@@ -62,37 +63,60 @@ int mono( int id, int dir ) {
          printf( "Mono %2d quiere cruzar de derecha a izquierda\n", id );
          break;
    }
-   // printf("Dir shared: %d\n Dir mono: %d",sharedData->dir,dir);
-   bool condicion1=sharedData->dir==dir;
-   bool condicion2=sharedData->cantidadPasados<J;
-   bool condicion3=sharedData->cantidadEnCuerda<MaxEnCuerda;
-   if(condicion1 && condicion2 && condicion3){
-        printf("\tAcceso del mono %2d%s",id," concedido\n");
-        sharedData->cantidadEnCuerda++;     
-        sharedData->cantidadPasados++;
-        usleep(10);
-        printf("El mono %2d ha cruzado el barranco exitosamente!\n",id);       
-        sharedData->cantidadEnCuerda--;
-    }
-    else{
-         printf("\tAcceso del mono %2d%s",id," denegado\n");
+   bool puedeCruzar=false;
+      bool condicion1=sharedData->dir==dir;
+      //bool condicion2=sharedData->cantidadPasados<J;
+      bool condicion3=sharedData->cantidadEnCuerda<MaxEnCuerda;
+   while(!puedeCruzar){
+      bool condicion1=sharedData->dir==dir;
+      if(condicion1){ //&& condicion3
+         printf("\tAcceso del mono %2d%s",id," concedido\n");
+         sharedData->cantidadEnCuerda++;     
+         sharedData->cantidadPasados++;
+         usleep(10);
+         //printf("El mono %2d ha cruzado el barranco exitosamente!\n",id);       
+         sharedData->cantidadEnCuerda--;
+         puedeCruzar=true;
+      }
+      else{
+         puedeCruzar=false;
+         printf("\tAcceso del mono %d denegado(direccion incorrecta)\n",id);
          if(dir==0){
-            // s.Wait(0);
+            sharedData->leftCounter++;
+            s.Wait(0);
          }
          else{
-            // s.Wait(1);
+            sharedData->rightCounter++;
+            s.Wait(1);
          }
-    }  
-   //  if(sharedData->cantidadPasados==J){
-   //     changeDirections();
-   //    //  sharedData->dir=(sharedData->dir==0) ? 1: 0;
-   //  }
-   //  if(sharedData->cantidadEnCuerda==0){
-   //     sharedData->empty=1;
-   //  }
-
+         
+         // else{
+         //    printf("\tAcceso del mono %2d denegado(cuerda llena)\n",id);
+         //    s.Wait(dir);
+         // }
+      }
+   }
+   //int dirSignal=(sharedData->dir==0)?1:0;
+   //int counterType=(dirSignal==0)?sharedData->leftCounter:sharedData->rightCounter;
+   //int cType=(sharedData->dir==0)?sharedData->leftCounter:sharedData->rightCounter;
+   // if(cType>0 && condicion3){
+   //    for(int i=0;i<cType;++i){
+   //       s.Signal(sharedData->dir);
+   //    }
+   // }  
+   printf("El mono %2d ha cruzado el barranco exitosamente!\n",id);       
+    if(sharedData->cantidadEnCuerda==0){
+       int dirSignal=(sharedData->dir==0)?1:0;
+       int counterType=(dirSignal==0)?sharedData->leftCounter:sharedData->rightCounter;
+       printf("No hay nadie en el barranco, cambio de direccion... \n");
+       changeDirections();
+       //usleep(1000);
+       for(int i=0;i<counterType;++i){
+         s.Signal(dirSignal);
+       }
+    }
+    //printf("Waiting on current: %d\n",(sharedData->dir==0)?sharedData->leftCounter:sharedData->rightCounter);
     exit( 0 );
-
 }
 
 int main( int argc, char ** argv ) {
@@ -130,6 +154,9 @@ int main( int argc, char ** argv ) {
          }
          exit(0);
       }
+      // else{
+      //    usleep(10);
+      // }
    }
 // Wait for all processes before destroy shared memory segment and finish
    for ( m = 0; m <= monos; m++ ) {

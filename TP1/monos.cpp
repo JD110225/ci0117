@@ -20,7 +20,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include "SemaforoArray.h"
-#define MONOS 10		// Cantidad de monos a crear en la manada
+#define MONOS 4		// Cantidad de monos a crear en la manada
 #define MaxEnCuerda 2		// Capacidad máxima de la cuerda
 #define J 3	// Cantidad permitada antes de cambiar la dirección
 #define DirIzqADer 1		// El mono cruza de izquierda a derecha

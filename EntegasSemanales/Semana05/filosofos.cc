@@ -1,10 +1,3 @@
-/*
- * Resuelve el problema de los filósofos utilizando un monitor "Mesa"
- * 
- * Author: Programacion Concurrente (Francisco Arroyo)
- * Version: 2020/Set/03
- */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -31,7 +24,7 @@ int Filosofo( int cual, Mesa * mesa ) {
    int eat, think;
 
    srand( getpid() );
-   for ( i = 0; i < 1; i++ ) {	// Do a round for thinking and eating
+   for ( i = 0; i < 10; i++ ) {	// Do a round for thinking and eating
       think = rand() & 0xfffff;
       usleep( think );
       mesa->pickup( cual );
@@ -47,6 +40,11 @@ int Filosofo( int cual, Mesa * mesa ) {
    exit( 0 );
 
 }
+
+
+/*
+ *
+ */
 int main( int argc, char ** argv ) {
    long workers;
    int worker, pid, memId;
@@ -86,4 +84,3 @@ int main( int argc, char ** argv ) {
    shmctl( memId, IPC_RMID, NULL );
 
 }
-

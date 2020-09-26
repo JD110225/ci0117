@@ -1,0 +1,363 @@
+<HTML>
+   <HEAD>
+      <link rel="stylesheet" type="text/css" href="/ci0117/css/contenido.css" media="screen">
+      <link rel="stylesheet" type="text/css" href="/ci0117/css/encab.css" media="screen">
+      <link rel="stylesheet" type="text/css" href="/ci0117/css/ci0117.css" media="screen">
+
+      <meta property="og:url" content="https://os.ecci.ucr.ac.cr/ci0117/">
+      <meta property="og:title" content="UCR/ECCI CI0117 Prog. Paralela y Concurrente">
+      <meta property="og:image" content="https://os.ecci.ucr.ac.cr/ci0117/parallel-computing.png">
+      <meta property="og:description" content="Aprender a resolver problemas que requieran mejora en el desempeño mediante la paralelización de tareas y división de datos">
+
+<SCRIPT LANGUAGE=JAVASCRIPT>
+
+function ver_notas( f ) {
+   var examen = 0;
+
+//window.alert( "ver notas " + f.exa2.options[f.exa2.selectedIndex].value );
+
+   if ( f.exa1.selectedIndex != 0 )  {
+      grupo = f.exa1.options[ f.exa1.selectedIndex ].value;
+      examen = 1;
+      f.exa1.selectedIndex = 0;
+   }
+   if ( f.exa2.selectedIndex != 0 )  {
+      grupo = f.exa2.options[ f.exa2.selectedIndex ].value;
+      examen = 2;
+      f.exa2.selectedIndex = 0;
+   }
+
+   if ( f.exa3.selectedIndex != 0 )  {
+      grupo = f.exa3.options[ f.exa3.selectedIndex ].value;
+      examen = 3;
+      f.exa3.selectedIndex = 0;
+   }
+
+/*
+   if ( f.exa4.selectedIndex != 0 )  {
+      grupo = f.exa4.options[ f.exa4.selectedIndex ].value;
+      examen = 4;
+      f.exa4.selectedIndex = 0;
+   }
+
+   if ( f.exa5.selectedIndex != 0 )  {
+      grupo = f.exa5.options[ f.exa5.selectedIndex ].value;
+      examen = 5;
+      f.exa5.selectedIndex = 0;
+   }
+
+   if ( examen == 4 ) {
+      window.alert( "Ampliacion: 2013/Jul/18 1 p.m. en la ECCI\n\n Favor enviar los comentarios del curso a \"farroyom@gmail.com\"\n\n Dudas o reclamos al correo \"farroyom@gmail.com\"" );
+   }
+
+   if ( f.exa5.selectedIndex != 0 )  {
+      grupo = f.exa5.options[ f.exa5.selectedIndex ].value;
+      examen = 5;
+      f.exa5.selectedIndex = 0;
+  }
+
+   if ( f.exa4.selectedIndex != 0 )  {
+      grupo = f.exa4.options[ f.exa4.selectedIndex ].value;
+      examen = 4;
+      f.exa4.selectedIndex = 0;
+   }
+
+   if ( examen == 5 ) {
+      window.alert( "Ampliacion: cambios aplicados\n\n" );
+   }
+*/
+
+//   window.alert( "notas.php?grupo=" + grupo + "&examen=" + examen);
+   if ( examen == 3 || examen == 4 ) {
+//      window.alert( "Ampliacion: 2019/Jul/23 5 p.m. en la ECCI" );
+      location.href = "notas.php?examen=" + examen + "&grupo=" + grupo;
+   } else {
+      location.href = "notas-grupo.php?examen=" + examen;
+   }
+
+}
+
+</SCRIPT>
+
+</HEAD>
+
+<BODY>
+<TITLE> CI-0117 </TITLE>
+<DIV class="st01">
+<TABLE WIDTH=100%>
+   <TR>
+      <TD>
+         <H1> Universidad de Costa Rica </H1>
+         <H2> Escuela de Ciencias de la Computaci&oacute;n e Inform&aacute;tica </H2>
+         <H3> CI-0117 Programaci&oacute;n Paralela y Concurrente </H3>
+         <H3> Curso te&oacute;rico </H3>
+      </TD>
+      <TD>
+         <IMG SRC="/images/ECCI-new-logo-transparent.png" WIDTH=100px>
+      </TD>
+   </TR>
+</TABLE>
+</DIV>
+
+<HR>
+
+<DIV class="st02">
+
+<CENTER> 
+<FORM>
+<TABLE BORDER=1 class="contenido"> 
+   <TR>
+      <TD COLSPAN=2> Programaci&oacute;n Paralela y Concurrente </TD>
+   </TR>
+   <TR>
+      <TD> <FONT SIZE=+1> Descripci&oacute;n </FONT> </TD>
+      <TD>
+         <UL class="st01">
+            <LI> <A HREF="ci0117.html" > HTML </A> </LI>
+            <LI> <A HREF="ci0117.pdf" TARGET=_new> PDF </A> </LI>
+         </UL>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> Grupos de Telegram </TD>
+      <TD>
+         <UL class="st01">
+            <LI> <A HREF="https://t.me/joinchat/QJybJBYM8HWYJd-K_gO1sw" TARGET=_new> Grupo 2 </A> </LI>
+            <LI> <A HREF="https://t.me/joinchat/QJybJBxvWjP8cWnaq6T3Ag" TARGET=_new> Grupo 3 </A> </LI>
+         </UL>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> Enlace Zoom de todas las clases </TD>
+      <TD>
+         <UL class="st01">
+            <LI> <A HREF="https://udecr.zoom.us/j/93675952165?pwd=TnNaZGxkaElrR2dWOWVUZkRDSTc3QT09" TARGET=_new> Grupo 2 </A> </LI>
+            <LI> <A HREF="https://udecr.zoom.us/j/98941639816?pwd=eUNUNHFaalgxcGZTbFNsQVhwby9OUT09" TARGET=_new> Grupo 3 </A> </LI>
+         </UL>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> <FONT SIZE=+1> Tem&aacute;tica </FONT> </TD>
+      <TD>
+        <A HREF="tematica/index.html"> Cuadro </A>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> <FONT SIZE=+1> Materiales del curso </FONT> </TD>
+      <TD> 
+         <A HREF="/ci0117/slides/index.php"> CI0117 </A> <BR>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> <FONT SIZE=+1> Material adicional </FONT> </TD>
+      <TD>
+         <A HREF="ejemplos/index.php"> Ejemplos </A> <BR>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> <FONT SIZE=+1> Tareas semanales </FONT> </TD>
+      <TD>
+         <A HREF="practicas/index.php"> Tareas semanales </A> <BR>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> <FONT SIZE=+1> Clases virtuales </FONT> </TD>
+      <TD>
+         <A HREF="clasesVirtuales/index.php"> Listado </A> <BR>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD> <FONT SIZE=+1> Control de versiones GIT </FONT> </TD>
+      <TD>
+         <UL class="st1">
+            <LI> <A HREF="https://www.youtube.com/watch?v=Uw8SIaAK-vw" TARGET=_new> Git (video) </A> </LI>
+            <LI> <A HREF="https://github.github.com/training-kit/downloads/es_ES/github-git-cheat-sheet.pdf" TARGET=_new> Comandos Git </A> </LI>
+            <LI> <A HREF="git/progit.pdf" TARGET=_new> Libro Git </A> </LI>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD COLSPAN=2> <FONT SIZE=+2> Ex&aacute;menes </FONT> </TD>
+   </TR>
+   <TR>
+      <TD>
+         Examen # 1 (Cap&iacute;tulos 
+         <A HREF="slides/Chapter_1.ppt"> I</A>,
+         <A HREF="slides/Chapter_2.ppt"> II </A>,
+         <A HREF="slides/Chapter_4.ppt"> IV </A>, <BR>
+         fork e IPC [Sem, Buz, Mem Comp] )
+      </TD>
+
+      <TD>
+         <UL class="st1"> 
+            <LI> Grupo 2: Fecha: V 2020/Oct/02 09  a.m. Aula: ECCI Virtual </LI>
+            <LI> Grupo 3: Fecha: L 2020/Oct/05 09  a.m. Aula: ECCI Virtual </LI>
+         </UL>
+         <CENTER>
+            Notas 
+            <SELECT NAME=exa1 ONCHANGE="ver_notas(this.form)" >
+               <OPTION VALUE=23 SELECTED > Seleccionar </OPTION>
+               <OPTION VALUE=2> Grupo 2 </OPTION>
+               <OPTION VALUE=3> Grupo 3 </OPTION>
+            </SELECT>
+         </CENTER>
+      </TD>
+   </TR>
+ 
+   <TR>
+      <TD>
+         Examen # 2 (Cap&iacute;tulos, 
+         <A HREF="slides/Chapter_3.ppt"> III </A>,
+         <A HREF="slides/Chapter_5.ppt"> V </A>,
+         <A HREF="slides/Chapter_6.ppt"> VI </A> <BR>
+         y aceleradores gráficos)
+      </TD>
+
+      <TD>
+         <UL class="st1"> 
+            <LI> Grupo 2: Fecha: V 2020/Dic/04 09 a.m. Aula: ECCI Virtual </LI>
+            <LI> Grupo 3: Fecha: J 2020/Dic/03 09 a.m. Aula: ECCI Virtual </LI>
+         </UL>
+         <CENTER>
+            Notas 
+            <SELECT NAME=exa2 ONCHANGE="ver_notas(this.form)">
+               <OPTION VALUE=23 SELECTED > Seleccionar </OPTION>
+               <OPTION VALUE=2 Grupo 2 </OPTION>
+               <OPTION VALUE=3 Grupo 3 </OPTION>
+            </SELECT>
+         </CENTER>
+      </TD>
+   </TR> 
+
+   <TR>
+      <TD> <FONT SIZE=+2> Proyectos Programados </FONT> </TD>
+      <TD ALIGN="center"> Modalidad: Individual </TD>
+   </TR
+
+   <TR>
+      <TD>
+         <UL class="st1">
+            <LI> Primer proyecto </LI>
+         </UL>
+      </TD>
+      <TD>
+         <UL class="st1">
+            <LI> <A HREF="proyectos/Proyecto-1.pdf"> Enunciado </A> </LI>
+            <LI> Entrega: 2020/Set/11 al final del d&iacute;a </LI>
+            <LI> <A HREF="proyectos/papa.c"> papa.c </A> </LI>
+            <LI> <A HREF="proyectos/monos.c"> monos.c </A> </LI>
+         </UL>
+      </TD>
+   </TR
+
+   <TR>
+      <TD>
+         <UL class="st1">
+            <LI> Segundo proyecto </LI>
+         </UL>
+      </TD>
+      <TD>
+         <UL class="st1">
+            <LI> <A HREF="proyectos/Proyecto-2.pdf"> Enunciado </A> </LI>
+            <LI> Entrega: 2020/Oct/09 al final del d&iacute;a </LI>
+         </UL>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD>
+         <UL class="st1">
+            <LI> Tercer proyecto </LI>
+         </UL>
+      </TD>
+      <TD>
+         <UL class="st1">
+            <LI> <A HREF="proyectos/Proyecto-3.pdf"> Enunciado </A> </LI>
+            <LI> Entrega: 2020/Nov/06 al final del d&iacute;a </LI>
+         </UL>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD>
+         <UL class="st1">
+            <LI> Cuarto proyecto </LI>
+         </UL>
+      </TD>
+      <TD>
+         <UL class="st1">
+            <LI> <A HREF="proyectos/Proyecto-4.pdf"> Enunciado </A> </LI>
+            <LI> Entrega: 2020/Dic/04 al final del d&iacute;a </LI>
+         </UL>
+      </TD>
+   </TR>
+
+   <TR>
+      <TD ALIGN=CENTER>
+         <FONT SIZE=+2> Acceso a la ECCI por VPN </FONT>
+      </TD>
+      <TD ALIGN=CENTER>
+         <BR>
+         <A HREF="OpenVPN/ecci-vpn.zip"> Config. Zip </A>
+      </TD>
+   </TR>
+
+   <TR>
+
+   <TR>
+      <TD ALIGN=CENTER>
+         <FONT COLOR=RED SIZE=+2> Resultados parciales </FONT>
+         <BR>(al 2020/Ago/10)
+      </TD>
+      <TD ALIGN=CENTER>
+         <SELECT NAME=exa3 ONCHANGE="ver_notas(this.form)" >
+            <OPTION VALUE=23 SELECTED > Seleccionar </OPTION>
+            <OPTION VALUE=2> Grupo 2 </OPTION>
+            <OPTION VALUE=3> Grupo 3 </OPTION>
+         </SELECT>
+      </TD>
+   </TR> 
+
+   <TR>
+      <TD COLSPAN=2>
+<PRE>
+    
+  (^v^)  Linux
+ <(   )>
+   w w 
+</PRE>
+
+      </TD>
+   </TR>
+
+<!--
+   <TR>
+      <TD BGCOLOR=ORANGE ALIGN=CENTER>
+         <FONT COLOR=RED SIZE=+3> Resultados Ampliacion </FONT>
+      </TD>
+      <TD BGCOLOR=ORANGE ALIGN=CENTER>
+         <SELECT NAME=exa5 ONCHANGE="ver_notas(this.form)" >
+            <OPTION VALUE=0 SELECTED > Seleccionar </OPTION>
+            <OPTION VALUE=1> Grupo 1 </OPTION>
+         </SELECT>
+      </TD>
+   </TR> 
+->
+
+</TABLE> 
+</FORM>
+
+</DIV>
+
+</CENTER> 
+</BODY>
+</HTML>
+

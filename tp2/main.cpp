@@ -1,21 +1,13 @@
 //Usage:./m.exe -t 3 -e 1,2 -f filename1.txt,filename2.txt
 #include "FileReader.h"
+#include <sys/time.h>
 using namespace std;
-//TODO:
-   // 1)Juntar los mapas. (CHECK)
-   // 2)Revisar el searchLine de la primera estrategia(CHECK,CORREGIDO)
-   // 3)Mapeo Dinamico
-   // 4)Mapeo original
-   // 5)Que actually cuente etiquetas y no cualquier cosa (CHECK)
-   // 6) Manejar errores de entrada de datos
-   // 7)Fixear problemas de merge en github.
-   // 8)Corregir presentacion datos(mayuscula y sin <>) (CHECK)
-// Como en los pthreads solo se puede pasar un argumento, se utilizan
-// estas dos variables globales como si fueran argumentos de la funcion "lec",
-// encargada de crear instancias de la clase FileaReader.
+//Variables globales.
 string file;
 int stratNumber;
+//Estructura map de la stl para llevar el conteo de las etiquetas html
 map<string,int> m;
+//Toma un string que consiste en varias palabras separadas por "," y lo transforma en un vector de enteros
 vector<int> parseStringToArray(char* s,char delimiter){
    vector<int> vec;
    string token;
@@ -25,7 +17,7 @@ vector<int> parseStringToArray(char* s,char delimiter){
    }
    return vec;
 }
-//Lamentablemente no se pueden usar templates por el metodo stoi...
+//Hace lo mismo que el metodo anterior pero genera un vector de strings(por el metodo stoi no fue posible el uso templates)
 vector<string> parser2(char* s,char delimiter){
    vector<string> vec;
    string token;
@@ -35,7 +27,16 @@ vector<string> parser2(char* s,char delimiter){
    }
    return vec;
 }
-
+//Muestra el mapa general que contiene las etiquetas html y su respectivo conteo.
+void showMapa(map<string,int> mapa){
+    map<string, int>::iterator iter;
+    for (iter = mapa.begin(); iter != mapa.end(); ++iter){
+        cout << '\t' << iter->first
+            << '\t' << iter->second << '\n';
+    }
+    cout<<endl;
+}
+//Actualiza el mapa principal con los contenidos de otro mapa.
 void updateMap(map<string,int>mapa){
    for(auto i=mapa.begin();i!=mapa.end();++i){
       map<string, int>::iterator iter;
@@ -48,7 +49,7 @@ void updateMap(map<string,int>mapa){
       }
    }
 }
-//Crea una instancia de FileReader, esta funcion se pasa como argumento a pthread_create.
+//Crea una instancia de FileReader, se llama una vez por cada archivo HTML que el usuario provee
 void crearLector(int workers){
    FileReader reader(file,workers,stratNumber);
    reader.constructMap();
@@ -56,12 +57,13 @@ void crearLector(int workers){
    updateMap(subMapa);
 }
 int main(int argc, char *argv[]) {
+   //Pedir argumentos por terminal mediante el uso de la funcion getopt.
    int *estrategias;
    int option;
    char* workersPerThread=NULL;
    char *estrategia=NULL;
    char* files=NULL;
-   while((option = getopt(argc, argv, "t:e:f:")) != -1){ //get option from the getopt() method
+   while((option = getopt(argc, argv, "t:e:f:")) != -1){ 
       switch(option){
         case 't':
             workersPerThread=optarg;
@@ -76,36 +78,22 @@ int main(int argc, char *argv[]) {
    }
    vector<string> vectorArchivos=parser2(files,',');
    int cantidadArchivos=vectorArchivos.size();
-   //  while(optind < argc){
-   //      ++optind;    
-   //       vectorArchivos.push_back(argv[optind]);
-   //  }
    vector<int> vectorEstrategias=parseStringToArray(estrategia,','); 
-   // cout<<"Cantidad Trabajadores/thread: "<<workersPerThread<<endl;
-   // cout<<"Estrategias: "<<estrategia<<endl;
-   // cout<<"Cantidad archivos: "<<cantidadArchivos<<endl;
+   //Por cada archivo, se llama a crearLector
    for(int i=0;i<cantidadArchivos;++i){
-      stratNumber=vectorEstrategias[i];
-      file=vectorArchivos[i];
-      // FileReader reader(file,atoi(workersPerThread),stratNumber);
+      stratNumber=vectorEstrategias[i];   //Estrategia para un archivo en particular
+      file=vectorArchivos[i];             //Nombre del archivo a procesar.
       crearLector(atoi(workersPerThread));
-      // reader.constructMap();
-      // reader.showMapa();
    }
-   map<string,int> prueba;
+   cout<<endl;
+   cout<<"\t\t\t\t\tConteo de etiquetas HTML: "<<endl;
+   cout<<endl;
+   //Mostrar la estructura general con las etiquetas y su conteo
    for(auto i=m.begin();i!=m.end();++i){
         cout << '\t' << i->first
        << '\t' << i->second << '\n';
    }
-   //  pthread_t threads[cantidadArchivos]; 
-   //  for (int i = 0; i < cantidadArchivos; i++) {
-   //      stratNumber=vectorEstrategias[i];
-   //      file=vectorArchivos[i];
-   //      pthread_create(&threads[i],NULL,lec,(void*)((atoi)(workersPerThread))); 
-   //      usleep(100);
-   //  } 
-   //  for (int i = 0; i < cantidadArchivos; i++)  
-   //      pthread_join(threads[i], NULL); 
    return 0;
 }
   
+

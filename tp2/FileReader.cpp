@@ -12,14 +12,6 @@ FileReader::FileReader(string fileName,int workers,int strat ){
     this->m=Mutex();
     this->cantidadLineas=numeroLineas(archivo);
 }
-struct argumentos{
-   FileReader f(string fileName,int workers,int strat);
-   int threadNum;   
-   // argumentos(string fileName,int workers,int strat){
-   //    int threadNumber=0;
-   //    this;
-   // }
-};
 //Muestra el mapa de un archivo HTML(para debuggear nada mas)
 void FileReader::showMapa(){
     map<string, int>::iterator iter;
@@ -199,7 +191,6 @@ map<string,int> FileReader::getMapa(){
 }
 //Crea los hilos
 int FileReader::constructMap(){
-    argumentos args;
     archivo.clear();
     archivo.seekg(0);
     pthread_t threads[workers]; 
@@ -228,7 +219,7 @@ int FileReader::constructMap(){
         default:
             break;
         }
-      usleep(500);     //Es necesario ...entre mayor el sleep mas estable el programa..
+      usleep(2000);     //Es necesario ...entre mayor el sleep mas estable el programa..
     } 
     for (int i = 0; i < workers; i++){ 
         pthread_join(threads[i], NULL); 

@@ -1,12 +1,9 @@
 //Usage:./m.exe -t 3 -e 1,2 -f filename1.txt,filename2.txt
 #include "FileReader.h"
-#include <sys/time.h>
 using namespace std;
 //Variables globales.
 string file;
 int stratNumber;
-ifstream archivo=ifstream("indexS.html");
-Mutex mut;
 //Estructura map de la stl para llevar el conteo de las etiquetas html
 map<string,int> m;
 //Toma un string que consiste en varias palabras separadas por "," y lo transforma en un vector de enteros

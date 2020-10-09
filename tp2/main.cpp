@@ -5,6 +5,8 @@ using namespace std;
 //Variables globales.
 string file;
 int stratNumber;
+ifstream archivo=ifstream("indexS.html");
+Mutex mut;
 //Estructura map de la stl para llevar el conteo de las etiquetas html
 map<string,int> m;
 //Toma un string que consiste en varias palabras separadas por "," y lo transforma en un vector de enteros
@@ -56,13 +58,59 @@ void crearLector(int workers){
    map<string,int> subMapa=reader.getMapa();
    updateMap(subMapa);
 }
+void read(string linea){
+   string word;
+   stringstream s(linea);
+   while(getline(s,word,'<')){
+         if(isalnum(word[0]) || word[0]=='/' || word[0]=='!'){
+               // cout<<"Tag: "<<word<<endl;
+         }
+      }
+}
+bool validateFileExistence(vector<string> files){
+   bool validos=true;
+   for(int i=0;i<files.size() && validos;++i){
+      ifstream f(files[i].c_str());
+      validos=f.good();
+   }
+   return validos;
+}
+bool estrategiaEnRango(vector<int> estrategias){
+   bool enRango=true;
+   for(int i=0;i<3 && enRango;++i){
+      if(estrategias[i]>4 || estrategias[i]<0){
+         enRango=false;
+      }
+   }
+   return enRango;
+}
+bool validateInput(char* workersPerThread,vector<int> estrategias,vector<string> files){
+   bool esValido=true;
+   if(estrategias.size()!=files.size()){
+      esValido=false;
+      cout<<"La cantidad de estrategias no es la misma que la de archivos!!"<<endl;
+   }
+   if(atoi(workersPerThread)<=0){
+      cout<<"Debe existir al menos un trabajador!!"<<endl;
+      esValido=false;
+   }
+   if(!validateFileExistence(files)){
+      cout<<"EL archivo no existe!!"<<endl;
+      esValido=false;
+   }
+   if(!estrategiaEnRango(estrategias)){
+      cout<<"Se selecciono una estrategia invalida!!"<<endl;
+      esValido=false;
+   }
+   return esValido;
+}
 int main(int argc, char *argv[]) {
    //Pedir argumentos por terminal mediante el uso de la funcion getopt.
    int *estrategias;
    int option;
    char* workersPerThread=NULL;
    char *estrategia=NULL;
-   char* files=NULL;
+   char* files=NULL;   
    while((option = getopt(argc, argv, "t:e:f:")) != -1){ 
       switch(option){
         case 't':
@@ -78,7 +126,11 @@ int main(int argc, char *argv[]) {
    }
    vector<string> vectorArchivos=parser2(files,',');
    int cantidadArchivos=vectorArchivos.size();
-   vector<int> vectorEstrategias=parseStringToArray(estrategia,','); 
+   vector<int> vectorEstrategias=parseStringToArray(estrategia,',');
+   bool valid=validateInput(workersPerThread,vectorEstrategias,vectorArchivos);
+   if(!valid){
+      exit(0);
+   }
    //Por cada archivo, se llama a crearLector
    for(int i=0;i<cantidadArchivos;++i){
       stratNumber=vectorEstrategias[i];   //Estrategia para un archivo en particular

@@ -9,6 +9,7 @@
 #include <vector>
 #include "Mutex.h"
 #include <regex>
+#include "utility"
 using namespace std;
 class FileReader{
     public:
@@ -19,7 +20,7 @@ class FileReader{
     bool noEsIgualADocType(string s);  //Por alguna razon !DOCTYPE no pasa los test cases
     int numeroLineas(ifstream& file);
     void searchLine(int lineNum);
-    void* readStrat1(void);
+    void* readStrat1(void*);
     void* readStrat2(void);
     void* readStrat3(void);
     void* readStratOriginal(void);
@@ -32,11 +33,12 @@ class FileReader{
     void addMapa(string palabra);
     map<string,int> getMapa();
     int constructMap();
-    private:
-     Mutex m;
-     map <string,int> mapa;
      ifstream archivo;
      int workers;
      int strat;
      int cantidadLineas;
+    private:
+     Mutex m;
+     map <string,int> mapa;
+
 };

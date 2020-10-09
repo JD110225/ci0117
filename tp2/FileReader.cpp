@@ -12,6 +12,14 @@ FileReader::FileReader(string fileName,int workers,int strat ){
     this->m=Mutex();
     this->cantidadLineas=numeroLineas(archivo);
 }
+struct argumentos{
+   FileReader f(string fileName,int workers,int strat);
+   int threadNum;   
+   // argumentos(string fileName,int workers,int strat){
+   //    int threadNumber=0;
+   //    this;
+   // }
+};
 //Muestra el mapa de un archivo HTML(para debuggear nada mas)
 void FileReader::showMapa(){
     map<string, int>::iterator iter;
@@ -69,6 +77,7 @@ int FileReader::numeroLineas(ifstream& file){
 }
 //Lee y agrega al mapa
 void FileReader::read(string linea){
+   // m.Lock();
    string word;
    stringstream s(linea);
    while(getline(s,word,'<')){
@@ -76,20 +85,19 @@ void FileReader::read(string linea){
                addMapa(word);
          }
       }
+   // m.Unlock();
 }
 //Primera estrategia de lectura,mapeo estatico equitativo
- void* FileReader::readStrat1(void){
+ void* FileReader::readStrat1(void* arg){
    m.Lock();
    numThread++; 
    string l;
    int lineasAsignadas=cantidadLineas/this->workers;
+   string str;
    if(numThread!=this->workers-1){
-      string str;
-      for(int i=0;i<lineasAsignadas;++i){
-         getline(archivo,l);
-         // cout<<"L: "<<l<<endl;
-         // cout<<"Linea asignada es: "<<l<<endl;
-         read(l);
+   for(int i=0;i<lineasAsignadas;++i){
+      getline(archivo,l);
+      read(l);
       }
    }
    else{
@@ -97,14 +105,17 @@ void FileReader::read(string linea){
          read(l);
       }
    }
+   
    m.Unlock();
    pthread_exit(0);
  }
  //No se puede llamar a pthread con un metodo de una clase,asi que
 //  se usan funciones estaticas auxiliares que llaman a una estrategia especifica
 void* FileReader::readStrat1Helper(void *context){
-    return ((FileReader*)context)->readStrat1();
-}
+     return ((FileReader*)context)->readStrat1((FileReader*)context);
+      pthread_exit(0);
+
+   }
 //Segunda estrategia de lectura(modulo)
 void* FileReader::readStrat2(void){
    m.Lock();
@@ -139,6 +150,7 @@ void* FileReader::readStrat3(void){
    string str;
    while(getline(archivo,str)){
       m.Lock();
+      cout<<"Leyo el hilo: "<<numThread<<endl;
       read(str);
       m.Lock();
    }
@@ -187,12 +199,18 @@ map<string,int> FileReader::getMapa(){
 }
 //Crea los hilos
 int FileReader::constructMap(){
-   // numThread=0;
-   archivo.clear();
-   archivo.seekg(0);
+    argumentos args;
+    archivo.clear();
+    archivo.seekg(0);
     pthread_t threads[workers]; 
     srand(time(NULL));
+    vector<pair<FileReader*,int>> vect;
+    for(int i=0;i<3;++i){
+       pair<FileReader*,int> aPair=make_pair(this,i);
+       vect.push_back(aPair);
+    }
     for (int i = 0; i < workers; i++) {
+        std:pair<FileReader*,int> a(this,i);
         switch (this->strat)
         {
         case 1:
@@ -210,7 +228,7 @@ int FileReader::constructMap(){
         default:
             break;
         }
-      usleep(200);
+      usleep(500);     //Es necesario ...entre mayor el sleep mas estable el programa..
     } 
     for (int i = 0; i < workers; i++){ 
         pthread_join(threads[i], NULL); 

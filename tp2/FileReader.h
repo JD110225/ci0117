@@ -10,6 +10,9 @@
 #include "Mutex.h"
 #include <regex>
 #include "utility"
+#include "thread"
+#include <mutex>
+#include "sys/time.h"
 using namespace std;
 class FileReader{
     public:
@@ -17,28 +20,24 @@ class FileReader{
     string parseTag(string & tag);
     void upper(string & s);
     void read(string);
-    bool noEsIgualADocType(string s);  //Por alguna razon !DOCTYPE no pasa los test cases
     int numeroLineas(ifstream& file);
     void searchLine(int lineNum);
-    void* readStrat1(void*);
-    void* readStrat2(void);
-    void* readStrat3(void);
-    void* readStratOriginal(void);
-    static void* readStrat1Helper(void *);
-    static void* readStrat2Helper(void *);
-    static void* readStrat3Helper(void *);
-    static void* readStratOriginalHelper(void*);
+    void readStrat1(int);
+    void readStrat2(int);
+    void readStrat3(int);
+    void readStratOriginal(int);
     bool isValidHtml(string);
     void showMapa();
     void addMapa(string palabra);
     map<string,int> getMapa();
     int constructMap();
-     ifstream archivo;
-     int workers;
-     int strat;
-     int cantidadLineas;
     private:
-     Mutex m;
-     map <string,int> mapa;
+    ifstream archivo;
+    int workers;
+    int strat;
+    int cantidadLineas;
+    std::mutex mut;
+    Mutex m;
+    map <string,int> mapa;
 
 };

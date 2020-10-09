@@ -1,9 +1,5 @@
-//Usage:./m.exe -t 3 -e 1,2 -f filename1.txt,filename2.txt
 #include "FileReader.h"
 using namespace std;
-//Variables globales.
-string file;
-int stratNumber;
 //Estructura map de la stl para llevar el conteo de las etiquetas html
 map<string,int> m;
 //Toma un string que consiste en varias palabras separadas por "," y lo transforma en un vector de enteros
@@ -48,22 +44,32 @@ void updateMap(map<string,int>mapa){
       }
    }
 }
+void startTimer( struct timeval * timerStart) {
+   gettimeofday( timerStart, NULL );
+}
+
+
+/*
+ *  time elapsed in ms
+ */
+double getTimer( struct timeval timerStart ) {
+   struct timeval timerStop, timerElapsed;
+   gettimeofday(&timerStop, NULL);
+   timersub(&timerStop, &timerStart, &timerElapsed);
+   return timerElapsed.tv_sec*1000.0+timerElapsed.tv_usec/1000.0;
+}
 //Crea una instancia de FileReader, se llama una vez por cada archivo HTML que el usuario provee
-void crearLector(int workers){
+void crearLector(string file,int workers,int stratNumber){
+   struct timeval timerStart;
+   double used;
+   startTimer( & timerStart );
    FileReader reader(file,workers,stratNumber);
    reader.constructMap();
+   used = getTimer( timerStart );
    map<string,int> subMapa=reader.getMapa();
    updateMap(subMapa);
 }
-void read(string linea){
-   string word;
-   stringstream s(linea);
-   while(getline(s,word,'<')){
-         if(isalnum(word[0]) || word[0]=='/' || word[0]=='!'){
-               // cout<<"Tag: "<<word<<endl;
-         }
-      }
-}
+//Verifica si un archivo HTML existe.
 bool validateFileExistence(vector<string> files){
    bool validos=true;
    for(int i=0;i<files.size() && validos;++i){
@@ -72,6 +78,7 @@ bool validateFileExistence(vector<string> files){
    }
    return validos;
 }
+//Verifica si la estrategia ingresada por el usuario es valida.
 bool estrategiaEnRango(vector<int> estrategias){
    bool enRango=true;
    for(int i=0;i<3 && enRango;++i){
@@ -81,6 +88,7 @@ bool estrategiaEnRango(vector<int> estrategias){
    }
    return enRango;
 }
+//Verifica la validez del input del usuario
 bool validateInput(char* workersPerThread,vector<int> estrategias,vector<string> files){
    bool esValido=true;
    if(estrategias.size()!=files.size()){
@@ -128,11 +136,13 @@ int main(int argc, char *argv[]) {
    if(!valid){
       exit(0);
    }
+   int stratNumber;
+   string file;
    //Por cada archivo, se llama a crearLector
    for(int i=0;i<cantidadArchivos;++i){
       stratNumber=vectorEstrategias[i];   //Estrategia para un archivo en particular
       file=vectorArchivos[i];             //Nombre del archivo a procesar.
-      crearLector(atoi(workersPerThread));
+      crearLector(file,atoi(workersPerThread),stratNumber);
    }
    cout<<endl;
    cout<<"\t\t\t\t\tConteo de etiquetas HTML: "<<endl;

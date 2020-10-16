@@ -18,15 +18,15 @@ long sumUno(int threads) {
     int i;
     long totalParcial = 0;
    #pragma omp parallel for num_threads(threads) \
-      // reduction(+: totalParcial)
+   reduction(+: totalParcial)private(i)
+   for(int thread=0;thread<threads;++thread){
     for (i = 0; i < 1000; i++) {
-        #pragma omp critical
         totalParcial++;
          #ifdef DEBUG
-         iterations[i] = omp_get_thread_num();
+         iterations[thread] = omp_get_thread_num();
          #endif
     }
-
+   }
 }
 
 void Print_iters(int iterations[], long n) {
@@ -37,7 +37,7 @@ void Print_iters(int iterations[], long n) {
    printf("------\t\t----------\n");
    which_thread = iterations[0];
    start_iter = stop_iter = 0;
-   for (i = 0; i <= n; i++)
+   for (i = 0; i <n; i++)
       if (iterations[i] == which_thread)
          stop_iter = i;
       else {
@@ -57,9 +57,8 @@ int main( int argc, char ** argv ) {
    if(argc > 1){
       threads = atoi(argv[1]);
    }
-   int n=1000;
    #ifdef DEBUG
-   iterations = malloc((n)*sizeof(int));
+   iterations = malloc((threads+1)*sizeof(int));
    #endif
 
    double start = omp_get_wtime();
@@ -67,7 +66,7 @@ int main( int argc, char ** argv ) {
    double time = omp_get_wtime() - start;
 
    #ifdef DEBUG
-   Print_iters(iterations, 1000);
+   Print_iters(iterations, threads);
    free(iterations);
    #endif
    printf( "Valor acumulado por %d threads es \033[91m %ld \033[0m en %f ms\n", threads, resultadoGlobal, time );

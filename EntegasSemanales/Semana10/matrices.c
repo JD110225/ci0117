@@ -6,35 +6,17 @@
 #ifdef DEBUG
 int* iterations;
 #endif
-
-// int* getColumna(int** m, int size,int num){
-//     int* col = new int[size];
-//     for (int i=0;i<size;++i){
-//         col[i] = m[i][num];
-//     }
-//     return col;
-// }
-// int* getFila(int **m,int size,int num){
-//     int* fila = new int[size];
-//     for (int i = 0; i < size; ++i) {
-//         fila[i] = m[num][i];
-//     }
-//     return fila;
-// }
-// int arrayMultiplication(int* a, int* b, int size) {
-//     int counter = 0;
-//     for (int i = 0; i < size; ++i) {
-//         counter += a[i] * b[i];
-//     }
-//     return counter;
-// }
+//      TIEMPO TRANSCURRIDO CON SIZE 200 Y 10 HILOS:
+// 1)STATIC:  0.031(default)
+// 2)DYNAMIC: 0.029
+// 3)GUIDED:  0.029
 int** matrixMultiplication(int** a, int** b,int size,int threads){
     int** matrizResultado = (int**)malloc((size*size*sizeof(int)));
     for (int f = 0; f < size; ++f) {
         matrizResultado[f] = (int*)malloc((size)*sizeof(int));
     }
     int f,c,k=0;
-    #pragma omp set OMP_SCHEDULE="dynamic";
+    // #pragma omp set OMP_SCHEDULE="dynamic";
     #pragma omp parallel for num_threads(threads)private(f,c,k) schedule(runtime)
     for (f = 0; f < size; ++f) {
     for (c = 0; c < size; c++){
@@ -79,7 +61,6 @@ void displayMatrix(int** m,int size){
 }
 void Print_iters(int iterations[], long n) {
    int i, start_iter, stop_iter, which_thread;
-
    printf("\n");
    printf("Thread\t\tIterations\n");
    printf("------\t\t----------\n");
@@ -99,8 +80,8 @@ void Print_iters(int iterations[], long n) {
 }
 int main(int argc,char** argv)
 {
-    int size=5;
-    int threads=5;
+    int size=200;
+    int threads=10;
     if ( argc > 1 ) {
       threads = atoi(argv[1]);
       size = atoi(argv[2]);
@@ -115,12 +96,12 @@ int main(int argc,char** argv)
     int** resultMatrix=matrixMultiplication(m1, m2, size,threads);
     double empleado=omp_get_wtime()-start;
     // printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC); //stack overflow:https://stackoverflow.com/questions/876901/calculating-execution-time-in-c 
-    printf("M1: \n");
-    displayMatrix(m1, size);
-    printf("M2: \n");
-    displayMatrix(m2, size);
-    printf("RESULT: \n");
-    displayMatrix(resultMatrix,size);
+    // printf("M1: \n");
+    // displayMatrix(m1, size);
+    // printf("M2: \n");
+    // displayMatrix(m2, size);
+    // printf("RESULT: \n");
+    // displayMatrix(resultMatrix,size);
    #ifdef DEBUG
    Print_iters(iterations, size);
    free(iterations);

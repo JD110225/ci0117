@@ -6,27 +6,26 @@
 #ifdef DEBUG
 int* iterations;
 #endif
-//      TIEMPO TRANSCURRIDO CON SIZE 200 Y 10 HILOS:
-// 1)STATIC:  0.031(default)
-// 2)DYNAMIC: 0.029
-// 3)GUIDED:  0.029
+//      TIEMPO TRANSCURRIDO CON TAMANO 200 Y 10 HILOS:
+// 1)STATIC: 0.035 (sin poner schedule(runtime))
+// 2)DYNAMIC: 0.030 (export OMP_SCHEDULE=DYNAMIC)
+// 3)GUIDED:  0.028 (export OMP_SCHEDULE=GUIDED)
+//Conclusion: El metodo por defecto de "static" es  menos eficiente que el de 
+//"dynamic" y el mejor de todos(a pesar de que los tres esten sumamente parejos)
+//es el metodo "guided"
+//Nota: el schedule(runtime esta comentado en la linea 23)
 int** matrixMultiplication(int** a, int** b,int size,int threads){
     int** matrizResultado = (int**)malloc((size*size*sizeof(int)));
     for (int f = 0; f < size; ++f) {
         matrizResultado[f] = (int*)malloc((size)*sizeof(int));
     }
     int f,c,k=0;
-    // #pragma omp set OMP_SCHEDULE="dynamic";
-    #pragma omp parallel for num_threads(threads)private(f,c,k) schedule(runtime)
+    #pragma omp parallel for num_threads(threads)private(f,c,k) //schedule(runtime)
     for (f = 0; f < size; ++f) {
     for (c = 0; c < size; c++){
         for (k = 0; k < size; k++){
             matrizResultado[f][c] += a[f][k] * b[k][c]; 
-            // usleep(10);
         }
-        // int* fila = getFila(a,size,f);
-        // int* col = getColumna(b,size,c);
-        // matrizResultado[f][c] = arrayMultiplication(fila, col, size);
 
     }
     int t=omp_get_thread_num();

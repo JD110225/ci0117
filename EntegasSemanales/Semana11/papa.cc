@@ -91,6 +91,9 @@ int main(int argc, char** argv)
 
     // locks = new omp_lock_t[participantes];
     semaforos=new sem[participantes];
+    for(int i=0;i<participantes;++i){
+        semaforos[i]=sem(0);
+    }
     // for (int i = 0; i < participantes; ++i) {
     //     omp_init_lock(&locks[i]);
     // }

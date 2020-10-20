@@ -1,6 +1,7 @@
 #include "omp.h"
 class sem{
     public:
+        sem(int counter);
         sem();
         ~sem();
         void viewCounter();

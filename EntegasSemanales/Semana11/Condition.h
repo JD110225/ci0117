@@ -21,9 +21,9 @@ class Condition {
    public:
       Condition();
       ~Condition();
-      int Wait( Lock * );
+      void Wait( Lock * );
       //int TimedWait( Mutex *,long,long );
-      int Signal();
+      void Signal();
      // int Broadcast();
 
    private:

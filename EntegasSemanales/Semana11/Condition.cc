@@ -8,51 +8,23 @@ ción
 
 #include "Condition.h"
 
-/*
- * pthread_cond_init
- */
 Condition::Condition() {
    this->workers=0;
    this->internalWaitMechanism= new Lock();
-   // int resultado;
-   // vc=new pthread_cond_t();
-   // resultado=pthread_cond_init(vc,NULL);
-   // if(resultado==-1){
-   //    perror("Constructor error");
-   //    exit(0);
-   // }
 }
-
-
-/*
- * pthread_cond_destroy
- */
 Condition::~Condition() {
    delete this->internalWaitMechanism;
-   // int resultado;
-   // resultado=pthread_cond_destroy(vc);
-   // if(resultado==-1){
-   //    perror("Destructor error");
-   //    exit(0);
-   // }
 }
 
 
 /*
  * pthread_cond_wait
  */
-int Condition::Wait( Lock * affectedLock ) {
-   int resultado;
-   // resultado=pthread_cond_wait(vc,(mutex->getMutex()));
-   // if(resultado==-1){
-   //    perror("Wait error");
-   //    exit(0);
-   // }
+void Condition::Wait( Lock * affectedLock ) {
    this->workers++;
    affectedLock->Release();
    internalWaitMechanism->Acquire();
    affectedLock->Acquire();
-   return resultado;
 }
 
 
@@ -76,18 +48,11 @@ int Condition::Wait( Lock * affectedLock ) {
 /*
  * pthread_cond_signal
  */
-int Condition::Signal() {
+void Condition::Signal() {
    if(this->workers>0){
       this->workers--;
       internalWaitMechanism->Release();
    }
-   // int resultado;
-   // resultado=pthread_cond_signal(vc);
-   // if(resultado==-1){
-   //    perror("Signal error");
-   //    exit(0);
-   // }
-   // return resultado;
 }
 
 

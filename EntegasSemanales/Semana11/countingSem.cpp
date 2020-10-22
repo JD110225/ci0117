@@ -3,9 +3,9 @@
 #include <unistd.h>
 using namespace std;
 sem::sem(){
-
+    //por default
 }
-sem::sem(int counter){      //-3,0,-10  default lock empieza en 1
+sem::sem(int counter){      
     this->counter=counter;
     omp_init_lock(&this->semaphore);
     if(counter<=0){
@@ -27,8 +27,9 @@ void sem::Wait(){
         --counter;
     }
     }
-    omp_set_lock(&this->semaphore);
-
+    // if(counter==0){
+        omp_set_lock(&this->semaphore);
+// }
 }
 void sem::Signal(){
     //Signal incrementa el valor del counter

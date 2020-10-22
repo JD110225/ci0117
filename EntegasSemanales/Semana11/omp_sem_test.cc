@@ -13,7 +13,7 @@
 //-5->pass
 //200->pass
 int main( int cantidad, char ** valores ) {
-sem s(200);
+sem s(-5);
 #pragma omp parallel num_threads( 2 )
    if ( omp_get_thread_num() & 1 ) {
       sleep( 2 );

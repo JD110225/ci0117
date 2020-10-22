@@ -7,6 +7,7 @@ class sem{
         void viewCounter();
         void Wait();
         void Signal();
+        void semaphoreUpdate(int operation);
     private:
         int counter;
         omp_lock_t semaphore;

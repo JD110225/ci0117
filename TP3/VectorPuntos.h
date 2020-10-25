@@ -18,6 +18,8 @@ class VectorPuntos {
       double disimilaridad( VectorPuntos *, long * );
       void genEpsFormat( VectorPuntos *, long *, char * );
       void change(int index,Punto* p);
+      void sort();
+      void swap(int,int);
       Punto * operator [] ( long );
       void display();
       Punto* findMean(int cluster,long* vectorClases,int cantidadEnClusters);

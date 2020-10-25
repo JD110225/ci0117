@@ -30,7 +30,6 @@ int totalCambios = 0;	// Contabiliza la totalidad de los cambios realizados al g
 **/
 void asignarPuntosAClases( long * clases, int modo ) {
    long clase, pto;
-
    switch ( modo ) {
       case 0:	// Aleatorio
          for ( pto = 0; pto < muestras; pto++ ) {
@@ -38,8 +37,26 @@ void asignarPuntosAClases( long * clases, int modo ) {
             clases[ pto ] = clase;
          }
          break;
-      case 1:	// A construir por los estudiantes
+      case 1:{	// A construir por los estudiantes
+         //SORT SORT SORT SORT SORT
+         int elementosPorCasilla=muestras/casillas;
+         for(pto=1;pto<=muestras;++pto){
+            int clase;
+            if(pto%elementosPorCasilla==0){
+               clase=pto/elementosPorCasilla;
+               printf("Clase: %i\n",clase);
+            }
+            else{
+               clase=pto/elementosPorCasilla+1;
+               printf("Clase: %i\n",clase);
+            }
+            if(clase>casillas){  //un bug raro de que se asignaba un numero de clase mayor al permitido
+               clase=casillas;
+            }
+            clases[pto]=clase;
+         }
          break;
+      }
    }
 
 }
@@ -64,6 +81,7 @@ void verClases(long clases[CLASES]){
  *  Variable: contClases, almacena los valores para la cantidad de puntos que pertenecen a un conjunto
 **/
 int main( int cantidad, char ** parametros ) {
+   srand(time(NULL));  //IMPORTANTE xd
    long cambios, clase, minimo, pto;
    Punto * punto;
 // Procesar los parámetros del programa
@@ -77,35 +95,43 @@ int main( int cantidad, char ** parametros ) {
    VectorPuntos  puntos  = VectorPuntos( muestras, 10 );   	// Genera un conjunto de puntos limitados a un círculo de radio 10
    long clases[ muestras ];		// Almacena la clase a la que pertenece cada punto
    long contClases[ casillas ];
-   asignarPuntosAClases( clases, 0 );	// Asigna los puntos a las clases establecidas
    puntos.genEpsFormat( &centros, clases, (char *) "Pre.eps" );
-   do {
+   asignarPuntosAClases(clases,0);
+//NO SE SI ESTO SIRVE, HAY QUE REVISAR + VERIFICAR QUE SEA MEJOR QUE EL METODO RANDOM...PROBS.
+   puntos.sort();
+   asignarPuntosAClases(clases,1);
+   verClases(clases);
 
-	// Coloca todos los centros en el origen
-	// Promedia los elementos del conjunto para determinar el nuevo centro
-   for(int i=0;i<casillas;++i){
-      Punto* p=(puntos.findMean(i,clases,contarElementos(clases,i)));
-      centros.change(i,p);
-   }
+   //Aqui se mete OMP DE FIJISIMO BROOOO
+   for(int i=0;i<3;++i){
+      asignarPuntosAClases( clases, 0 );	// Asigna los puntos a las clases establecidas
+      // verClases(clases);
+      do {
 
-      cambios = 0;	// Almacena la cantidad de puntos que cambiaron de conjunto
-	// Cambia la clase de cada punto al centro más cercano
-   for(int i=0;i<muestras;++i){
-      int index=centros.masCercano(puntos[i]);
-      if(clases[i]!=index){
-         clases[i]=index;
-         ++cambios;
+      // Coloca todos los centros en el origen
+      // Promedia los elementos del conjunto para determinar el nuevo centro
+      for(int i=0;i<casillas;++i){
+         Punto* p=(puntos.findMean(i,clases,contarElementos(clases,i)));
+         centros.change(i,p);
       }
+
+         cambios = 0;	// Almacena la cantidad de puntos que cambiaron de conjunto
+      // Cambia la clase de cada punto al centro más cercano
+      for(int i=0;i<muestras;++i){
+         int index=centros.masCercano(puntos[i]);
+         if(clases[i]!=index){
+            clases[i]=index;
+            ++cambios;
+         }
+      }
+         totalCambios += cambios;
+
+      } while ( cambios > 0 );	// Si no hay cambios el algoritmo converge
+      printf( "Valor de la disimilaridad en la solución encontrada %g, con un total de %ld cambios\n", centros.disimilaridad( &puntos, clases ), totalCambios );
    }
-      totalCambios += cambios;
 
-   } while ( cambios > 0 );	// Si no hay cambios el algoritmo converge
-
-
-   printf( "Valor de la disimilaridad en la solución encontrada %g, con un total de %ld cambios\n", centros.disimilaridad( &puntos, clases ), totalCambios );
 
 // // Con los valores encontrados genera el archivo para visualizar los resultados
    puntos.genEpsFormat( &centros, clases, (char *) fileName );
-
 }
 

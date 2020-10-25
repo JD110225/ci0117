@@ -7,7 +7,6 @@
 #include <cassert>
 #include "VectorPuntos.h"
 
-
 /**
  *   Genera numeros random en punto flotante
  *
@@ -42,8 +41,24 @@ VectorPuntos::VectorPuntos( long cantidad, double radio ) {
    }
 
 }
-
-
+void VectorPuntos::swap(int a,int b){
+   Punto* temp= this->bloque[a];
+   bloque[a]=bloque[b];
+   bloque[b]=temp;
+}
+//Ordena los puntos con base en los valores de su eje x
+void VectorPuntos::sort(){
+   int min;
+   for(int i=0;i<elementos-1;++i){
+      min=i;
+      for(int j=i+1;j<elementos;j++){
+         if(bloque[j]->demeX()<bloque[min]->demeX()){
+            min=j;
+         }
+      }  
+    swap(min,i);
+   }
+}
 /**
  *   Rellena el vector de puntos con puntos colocados en el origen
  *
@@ -79,7 +94,6 @@ VectorPuntos::~VectorPuntos() {
  *  Retorna el elemento en la posición indicada del vector
  *
 **/
-//DOESNT WORK
 Punto * VectorPuntos::operator [] ( long posicion ) {
    assert( posicion >= 0 && posicion < elementos );
    return this->bloque[ posicion ];

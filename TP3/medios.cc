@@ -30,6 +30,11 @@ int totalCambios = 0;	// Contabiliza la totalidad de los cambios realizados al g
  *  Utiliza el vector de clases para realizar la asignación
  *  
 **/
+// /TO-DO:
+//    Fixear estrategia propia
+//    Meterle mas OMP en otras partes
+//    Testing ,casos de prueba
+//    3d?
 void asignarPuntosAClases( long * clases, int modo) {
    long clase, pto;
    switch ( modo ) {

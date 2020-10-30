@@ -13,6 +13,7 @@
 #include "VectorPuntos.h"
 #include "string"
 #include <algorithm>
+#include <omp.h>
 #define PUNTOS 100000
 #define CLASES 17
 #define defaultFileName "hm2.eps"
@@ -85,7 +86,12 @@ void copyContents(long* clases,long* otro,int size){
       otro[i]=clases[i];
    }
 }
-
+void prueba(){
+   #pragma omp parallel for num_threads(10) 
+   for(int i=0;i<10;++i){
+      printf("Hello from: %i\n",omp_get_thread_num());
+   }
+}
 int main( int cantidad, char ** parametros ) {
    srand(time(NULL));  //IMPORTANTE xd
    long cambios, clase, minimo, pto;
@@ -117,7 +123,9 @@ int main( int cantidad, char ** parametros ) {
       }
          cambios = 0;	// Almacena la cantidad de puntos que cambiaron de conjunto
       // Cambia la clase de cada punto al centro más cercano
+      #pragma omp parallel for num_threads(1)
       for(int i=0;i<muestras;++i){
+         // printf("Hola hola hola desde: %i\n",omp_get_thread_num());
          int index=centros.masCercano(puntos[i]);
          if(clases[i]!=index){
             clases[i]=index;
@@ -125,7 +133,6 @@ int main( int cantidad, char ** parametros ) {
          }
       }
          totalCambios += cambios;
-
       } while ( cambios > 0 );	// Si no hay cambios el algoritmo converge
       double disimilaridad=centros.disimilaridad( &puntos, clases );
       printf( "Valor de la disimilaridad en la solución encontrada %g, con un total de %ld cambios\n", disimilaridad, totalCambios );

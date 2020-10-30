@@ -11,6 +11,7 @@ class VectorPuntos {
    public:
       VectorPuntos( long, double );
       VectorPuntos( long );
+      VectorPuntos();
       ~VectorPuntos();
       long demeTamano();
       long masCercano( Punto * );

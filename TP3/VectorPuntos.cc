@@ -47,18 +47,19 @@ void VectorPuntos::swap(int a,int b){
    bloque[b]=temp;
 }
 //Ordena los puntos con base en los valores de su eje x
-void VectorPuntos::sort(){
-   int min;
-   for(int i=0;i<elementos-1;++i){
-      min=i;
-      for(int j=i+1;j<elementos;j++){
-         if(bloque[j]->demeX()<bloque[min]->demeX()){
-            min=j;
-         }
-      }  
-    swap(min,i);
-   }
-}
+//Nevermind bro
+// void VectorPuntos::sort(){
+//    int min;
+//    for(int i=0;i<elementos-1;++i){
+//       min=i;
+//       for(int j=i+1;j<elementos;j++){
+//          if(bloque[j]->demeX()<bloque[min]->demeX()){
+//             min=j;
+//          }
+//       }  
+//     swap(min,i);
+//    }
+// }
 /**
  *   Rellena el vector de puntos con puntos colocados en el origen
  *
@@ -73,7 +74,9 @@ VectorPuntos::VectorPuntos( long cantidad ) {
    }
 
 }
+VectorPuntos::VectorPuntos(){
 
+}
 
 /**
  *

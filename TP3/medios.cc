@@ -12,9 +12,10 @@
 #include <cstdio>
 #include "VectorPuntos.h"
 #include "string"
+#include <algorithm>
 #define PUNTOS 100000
 #define CLASES 17
-#define defaultFileName "file.eps"
+#define defaultFileName "hm2.eps"
 long casillas = CLASES;   //valor default
 long muestras = PUNTOS;    //valor default
 char* fileName=defaultFileName;
@@ -28,7 +29,7 @@ int totalCambios = 0;	// Contabiliza la totalidad de los cambios realizados al g
  *  Utiliza el vector de clases para realizar la asignación
  *  
 **/
-void asignarPuntosAClases( long * clases, int modo ) {
+void asignarPuntosAClases( long * clases, int modo) {
    long clase, pto;
    switch ( modo ) {
       case 0:	// Aleatorio
@@ -38,22 +39,21 @@ void asignarPuntosAClases( long * clases, int modo ) {
          }
          break;
       case 1:{	// A construir por los estudiantes
-         //SORT SORT SORT SORT SORT
          int elementosPorCasilla=muestras/casillas;
          for(pto=1;pto<=muestras;++pto){
             int clase;
             if(pto%elementosPorCasilla==0){
                clase=pto/elementosPorCasilla;
-               printf("Clase: %i\n",clase);
+               // printf("Clase: %i\n",clase);
             }
             else{
                clase=pto/elementosPorCasilla+1;
-               printf("Clase: %i\n",clase);
+               // printf("Clase: %i\n",clase);
             }
             if(clase>casillas){  //un bug raro de que se asignaba un numero de clase mayor al permitido
                clase=casillas;
             }
-            clases[pto]=clase;
+            clases[pto-1]=clase;
          }
          break;
       }
@@ -80,6 +80,12 @@ void verClases(long clases[CLASES]){
  *  Variable: clases, almacena la clase a la que pertenece cada punto, por lo que debe ser del mismo tamaño que las muestras
  *  Variable: contClases, almacena los valores para la cantidad de puntos que pertenecen a un conjunto
 **/
+void copyContents(long* clases,long* otro,int size){
+   for(int i=0;i<size;++i){
+      otro[i]=clases[i];
+   }
+}
+
 int main( int cantidad, char ** parametros ) {
    srand(time(NULL));  //IMPORTANTE xd
    long cambios, clase, minimo, pto;
@@ -92,29 +98,23 @@ int main( int cantidad, char ** parametros ) {
       fileName=parametros[3];
    }
    VectorPuntos  centros = VectorPuntos( casillas );
-   VectorPuntos  puntos  = VectorPuntos( muestras, 10 );   	// Genera un conjunto de puntos limitados a un círculo de radio 10
+   VectorPuntos puntos = VectorPuntos( muestras, 10 );   	// Genera un conjunto de puntos limitados a un círculo de radio 10
    long clases[ muestras ];		// Almacena la clase a la que pertenece cada punto
    long contClases[ casillas ];
    puntos.genEpsFormat( &centros, clases, (char *) "Pre.eps" );
-   asignarPuntosAClases(clases,0);
-//NO SE SI ESTO SIRVE, HAY QUE REVISAR + VERIFICAR QUE SEA MEJOR QUE EL METODO RANDOM...PROBS.
-   puntos.sort();
-   asignarPuntosAClases(clases,1);
-   verClases(clases);
-
    //Aqui se mete OMP DE FIJISIMO BROOOO
+   long bestClases[muestras];
+   double menorDisimilaridad=__DBL_MAX__;
    for(int i=0;i<3;++i){
-      asignarPuntosAClases( clases, 0 );	// Asigna los puntos a las clases establecidas
+      asignarPuntosAClases( clases, 0);	// Asigna los puntos a las clases establecidas
       // verClases(clases);
       do {
-
       // Coloca todos los centros en el origen
       // Promedia los elementos del conjunto para determinar el nuevo centro
       for(int i=0;i<casillas;++i){
          Punto* p=(puntos.findMean(i,clases,contarElementos(clases,i)));
          centros.change(i,p);
       }
-
          cambios = 0;	// Almacena la cantidad de puntos que cambiaron de conjunto
       // Cambia la clase de cada punto al centro más cercano
       for(int i=0;i<muestras;++i){
@@ -127,11 +127,18 @@ int main( int cantidad, char ** parametros ) {
          totalCambios += cambios;
 
       } while ( cambios > 0 );	// Si no hay cambios el algoritmo converge
-      printf( "Valor de la disimilaridad en la solución encontrada %g, con un total de %ld cambios\n", centros.disimilaridad( &puntos, clases ), totalCambios );
+      double disimilaridad=centros.disimilaridad( &puntos, clases );
+      printf( "Valor de la disimilaridad en la solución encontrada %g, con un total de %ld cambios\n", disimilaridad, totalCambios );
+      if(disimilaridad<menorDisimilaridad){
+         menorDisimilaridad=disimilaridad;
+         copyContents(clases,bestClases,muestras);
+      }
    }
+   printf("\n\t\t\t\tMEJOR RESULTADO\n\n");
+   printf( "Valor de la menor disimilaridad encontrada %g, con un total de %ld cambios\n", menorDisimilaridad, totalCambios );
 
 
 // // Con los valores encontrados genera el archivo para visualizar los resultados
-   puntos.genEpsFormat( &centros, clases, (char *) fileName );
+   puntos.genEpsFormat( &centros, bestClases, (char *) fileName );
 }
 

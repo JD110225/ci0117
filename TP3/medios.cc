@@ -18,7 +18,7 @@
 using namespace std;
 #define PUNTOS 100000
 #define CLASES 17
-#define defaultFileName "hm2.eps"
+#define defaultFileName "resultado.eps"
 long casillas = CLASES;   //valor default
 long muestras = PUNTOS;    //valor default
 char* fileName=defaultFileName;
@@ -27,20 +27,24 @@ char* fileName=defaultFileName;
 int totalCambios = 0;	// Contabiliza la totalidad de los cambios realizados al grupo de puntos
 
 
+
+// /TO-DO:
+//    Fixear estrategia propia         check 
+//    Meterle mas OMP en otras partes  check
+//    Testing ,casos de prueba         check
+//    Medir tiempos y determinar cantidad optima de hilos   check
+//    3d
+//    Documentacion interna y hacer readme explicando estrategia propia,donde se puso omp y parametros
 /**
  *  Coloca a cada punto en una clase de manera aleatoria
  *  Utiliza el vector de clases para realizar la asignación
- *  
+ *  En el readme se explica detalladamente el segundo modo de asignacion(la estrategia propia)
 **/
-// /TO-DO:
-//    Fixear estrategia propia
-//    Meterle mas OMP en otras partes
-//    Testing ,casos de prueba
-//    3d?
 void asignarPuntosAClases( long * clases, int modo) {
    long clase, pto;
    switch ( modo ) {
       case 0:	// Aleatorio
+         #pragma omp parallel for num_threads(4)
          for ( pto = 0; pto < muestras; pto++ ) {
             clase = rand() % casillas;
             clases[ pto ] = clase;
@@ -64,6 +68,7 @@ void asignarPuntosAClases( long * clases, int modo) {
    }
 
 }
+//Cuenta cuantos elementos hay en un cluster en particular
 int contarElementos(long* clases,int cluster){
    int counter=0;
    for(int i=0;i< muestras;++i){
@@ -73,24 +78,26 @@ int contarElementos(long* clases,int cluster){
    }
    return counter;
 }
+//Metodo para visualizar el vector de clases(para debuggear)
 void verClases(long clases[CLASES]){
    for(int i=0;i<muestras;++i){
       printf("%d\t",clases[i]);
    }
    printf("\n");
 }
-/**
- *  Programa muestra
- *  Variable: clases, almacena la clase a la que pertenece cada punto, por lo que debe ser del mismo tamaño que las muestras
- *  Variable: contClases, almacena los valores para la cantidad de puntos que pertenecen a un conjunto
-**/
+//Metodo auxiliar para copiar los contenidos de un arreglo a otro
 void copyContents(long* clases,long* otro,int size){
    for(int i=0;i<size;++i){
       otro[i]=clases[i];
    }
 }
+/**
+ *  Programa muestra
+ *  Variable: clases, almacena la clase a la que pertenece cada punto, por lo que debe ser del mismo tamaño que las muestras
+ *  Variable: contClases, almacena los valores para la cantidad de puntos que pertenecen a un conjunto
+**/
 int main( int cantidad, char ** parametros ) {
-   srand(time(NULL));  //IMPORTANTE xd
+   srand(time(NULL));  
    long cambios, clase, minimo, pto;
    Punto * punto;
 //Procesar los parámetros del programa
@@ -110,14 +117,11 @@ int main( int cantidad, char ** parametros ) {
    puntos.genEpsFormat( &centros, clases, (char *) "Pre.eps" );
    long bestClases[muestras];
    double menorDisimilaridad=__DBL_MAX__;
-   int inicio=omp_get_wtime();
+   //Iniciar a contar el tiempo
+   double inicio=omp_get_wtime();
    #pragma omp parallel for num_threads(3)
-   //CHANGE CHANGE CHANGE
-   for(int i=0;i<1;++i){
-      printf("Hello from thread: %i\n",omp_get_thread_num());
+   for(int i=0;i<3;++i){
       asignarPuntosAClases( clases, 1);	// Asigna los puntos a las clases establecidas
-      verClases(clases);
-      cout<<endl;
       do {
       // Coloca todos los centros en el origen
       // Promedia los elementos del conjunto para determinar el nuevo centro
@@ -129,7 +133,6 @@ int main( int cantidad, char ** parametros ) {
       // Cambia la clase de cada punto al centro más cercano
       #pragma omp parallel for num_threads(4)
       for(int i=0;i<muestras;++i){
-         // printf("Hola hola hola desde: %i\n",omp_get_thread_num());
          int index=centros.masCercano(puntos[i]);
          if(clases[i]!=index){
             clases[i]=index;
@@ -138,7 +141,6 @@ int main( int cantidad, char ** parametros ) {
       }
          totalCambios += cambios;
       } while ( cambios > 0 );	// Si no hay cambios el algoritmo converge
-      verClases(clases);
       double disimilaridad=centros.disimilaridad( &puntos, clases );
       printf( "Valor de la disimilaridad en la solución encontrada %g, con un total de %ld cambios\n", disimilaridad, totalCambios );
       if(disimilaridad<menorDisimilaridad){
@@ -146,10 +148,10 @@ int main( int cantidad, char ** parametros ) {
          copyContents(clases,bestClases,muestras);
       }
    }
-   int fin=omp_get_wtime();
+   double fin=omp_get_wtime();
+   printf( "Tiempo empleado: %gms\n", (fin - inicio)/1000 );
    printf("\n\t\t\t\tMEJOR RESULTADO\n\n");
    printf( "Valor de la menor disimilaridad encontrada %g, con un total de %ld cambios\n", menorDisimilaridad, totalCambios );
-   cout<<"Tiempo empleado: "<<(fin-inicio)/1000<<endl;
 
 // // Con los valores encontrados genera el archivo para visualizar los resultados
    puntos.genEpsFormat( &centros, bestClases, (char *) fileName );

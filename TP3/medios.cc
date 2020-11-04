@@ -18,7 +18,7 @@
 using namespace std;
 #define PUNTOS 100000
 #define CLASES 17
-#define defaultFileName "resultado.eps"
+#define defaultFileName "resultado.eps"   //Nombre default donde guardar el archivo .eps
 long casillas = CLASES;   //valor default
 long muestras = PUNTOS;    //valor default
 char* fileName=defaultFileName;
@@ -28,13 +28,7 @@ int totalCambios = 0;	// Contabiliza la totalidad de los cambios realizados al g
 
 
 
-// /TO-DO:
-//    Fixear estrategia propia         check 
-//    Meterle mas OMP en otras partes  check
-//    Testing ,casos de prueba         check
-//    Medir tiempos y determinar cantidad optima de hilos   check
-//    3d
-//    Documentacion interna y hacer readme explicando estrategia propia,donde se puso omp y parametros
+
 /**
  *  Coloca a cada punto en una clase de manera aleatoria
  *  Utiliza el vector de clases para realizar la asignación
@@ -43,14 +37,14 @@ int totalCambios = 0;	// Contabiliza la totalidad de los cambios realizados al g
 void asignarPuntosAClases( long * clases, int modo) {
    long clase, pto;
    switch ( modo ) {
-      case 0:	// Aleatorio
+      case 0:	// Asignacion aleatoria de puntos a clases
          #pragma omp parallel for num_threads(4)
          for ( pto = 0; pto < muestras; pto++ ) {
             clase = rand() % casillas;
             clases[ pto ] = clase;
          }
          break;
-      case 1:{	// A construir por los estudiantes
+      case 1:{	// Explicacion de la estrategia en el Readme
          int grupo=0;
          int indice=0;
          int groupCounter=1;
@@ -121,7 +115,7 @@ int main( int cantidad, char ** parametros ) {
    double inicio=omp_get_wtime();
    #pragma omp parallel for num_threads(3)
    for(int i=0;i<3;++i){
-      asignarPuntosAClases( clases, 1);	// Asigna los puntos a las clases establecidas
+      asignarPuntosAClases( clases,0);	// Asigna los puntos a las clases establecidas
       do {
       // Coloca todos los centros en el origen
       // Promedia los elementos del conjunto para determinar el nuevo centro

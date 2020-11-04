@@ -15,7 +15,10 @@ double randf( double base ) {
    return base * rand() / (RAND_MAX - 1.);
 
 }
+//Contructor por omision 
+VectorPuntos::VectorPuntos(){
 
+}
 /**
  *   Rellena el vector de puntos con puntos definidos en un circulo
  *
@@ -24,8 +27,6 @@ VectorPuntos::VectorPuntos( long cantidad, double radio ) {
    long punto;
    double angulo, r,x,y;
    srand(time(NULL));
-   // printf("%i\n",100*rand() / (RAND_MAX - 1.));
-   // printf("%i\n",100*rand() / (RAND_MAX - 1.));
    this->elementos = cantidad;
    this->bloque = (Punto **) calloc( sizeof( Punto *), cantidad );
    for ( punto = 0; punto < cantidad; punto++ ) {
@@ -33,33 +34,13 @@ VectorPuntos::VectorPuntos( long cantidad, double radio ) {
       r = randf( radio );
       x = r * cos( angulo );
       y = r * sin( angulo );
-      // int a=rand()%100;
-      // int b=rand()%100;
-      // y=rand()%100;
+
       this->bloque[ punto ] = new Punto( x, y );
-      // printf("%i\n",this->bloque[punto]->demeY());
    }
 
 }
-void VectorPuntos::swap(int a,int b){
-   Punto* temp= this->bloque[a];
-   bloque[a]=bloque[b];
-   bloque[b]=temp;
-}
-//Ordena los puntos con base en los valores de su eje x
-//Nevermind bro
-// void VectorPuntos::sort(){
-//    int min;
-//    for(int i=0;i<elementos-1;++i){
-//       min=i;
-//       for(int j=i+1;j<elementos;j++){
-//          if(bloque[j]->demeX()<bloque[min]->demeX()){
-//             min=j;
-//          }
-//       }  
-//     swap(min,i);
-//    }
-// }
+
+
 /**
  *   Rellena el vector de puntos con puntos colocados en el origen
  *
@@ -72,9 +53,6 @@ VectorPuntos::VectorPuntos( long cantidad ) {
    for ( elemento = 0; elemento < cantidad; elemento++ ) {
       bloque[ elemento ] = new Punto( 0, 0 );
    }
-
-}
-VectorPuntos::VectorPuntos(){
 
 }
 
@@ -102,9 +80,11 @@ Punto * VectorPuntos::operator [] ( long posicion ) {
    return this->bloque[ posicion ];
 
 }
+// Cambia el valor de un indice del atributo bloque(un vector de Punto*)
 void VectorPuntos::change(int index,Punto* p){
    this->bloque[index]=p;
 }
+//Metodo para visualizar un vector de puntos (para debuggear)
 void VectorPuntos::display(){
    for(int i=0;i<this->elementos;++i){
       bloque[i]->ver();
@@ -122,10 +102,9 @@ long VectorPuntos::demeTamano() {
 
 
 
-/**
- *  De los puntos en nuestro bloque encuentra el que esta más cercano al punto indicado como parámetro
- *
-**/
+// Encuentra el promedio de los puntos en un cluster particular...retorna un
+// punto cuyos valores "x" y "y" son los promedios de los valores "x" y "y"
+// de todos los puntos en el cluster.  
 Punto* VectorPuntos::findMean(int cluster,long* vectorClases,int cantidadEnCluster){
    double sumaX=0;
    double sumaY=0;
@@ -139,8 +118,11 @@ Punto* VectorPuntos::findMean(int cluster,long* vectorClases,int cantidadEnClust
    sumaY/=cantidadEnCluster;
    Punto* p=new Punto(sumaX,sumaY);
    return p;
-   // return suma/cantidadEnCluster;
 }
+/**
+ *  De los puntos en nuestro bloque encuentra el que esta más cercano al punto indicado como parámetro
+ *
+**/
 long VectorPuntos::masCercano( Punto * punto ) {
    long elemento, posicion;
    double distancia, minimo;

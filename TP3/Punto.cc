@@ -50,7 +50,7 @@ double Punto::demeY() {
 }
 
 /**
- *  Cambia el valor de las coordenadas
+ *  Cambia el valor de las coordenadas(no se utilizo)
 **/
 void Punto::ponga( double vx, double vy, double vz ) {
 

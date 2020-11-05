@@ -47,11 +47,6 @@ int participante(int partId)
     bool activo = true; 
     int next=((partId+1)%commsz);
     int prev=partId==0?commsz-1:partId-1;
-    // if(partId==participanteInicial){
-    //     MPI_Recv(&valorPapa,1,MPI_INT,prev,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-    //     MPI_Recv(&participantesActivos,1,MPI_INT,prev,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-    // }
-    // MPI_Send(&valorPapa,1,MPI_INT,next,0,MPI_COMM_WORLD);
     while (valorPapa!=-1)
     {
     // printf("Previo es: %d\n",prev);
@@ -85,94 +80,41 @@ int participante(int partId)
     MPI_Send(&valorPapa,1,MPI_INT,next,0,MPI_COMM_WORLD);   
     MPI_Send(&participantesActivos,1,MPI_INT,next,0,MPI_COMM_WORLD);   
     }
-    // MPI_Send(&valorPapa,1,MPI_INT,next,0,MPI_COMM_WORLD);   
-  
-        //     msgrcv(id,& m, sizeof(int)*3, 2028,0); //Espera por mensaje, incluso si no hay ahorita. Por la flag de 0
-        //     printf( "Soy %d. La papa tiene un valor de %d\n", partId, m.valorPapa );
-        //     if(m.idParticipanteDeseado == partId && activo && m.valorPapa>=0){ //EL mensaje es para mi, estoy activo, Papa no es negativa
-        //       printf( "-----------Llego la papa al participante %d\n", partId );
-        //       if(m.participantesActivos ==1){//Solo quedo yo en el juego
-        //         //Yo gane
-        //         m.valorPapa= -1;
-        //         activo=false; //Me pongo como inactivo, ya gane y termino el juego
-        //         m.participantesActivos--; //Habrian 0 participantes activos
-        //         printf( "HAY UN GANADOR! El participante %d ha ganado la ronda! \n", partId );
-        //       }else{//Sigue Ronda. Aplico Collatz
-        //         m.valorPapa= cambiarPapa(m.valorPapa);
-        //         if(m.valorPapa== 1){//Papa estallo
-        //           activo=false;
-        //           m.participantesActivos--;
-        //           m.valorPapa= rand()%998+2; //Nuevo valor aleatorio de la papa, en el mismo intervalo posible que el random inicial del main
-        //           printf( "\n\n\n**********ESTALLA LA PAPA al participante %d,se genera un nuevo valor de la papa.\n", partId  );
-        //         }else{
-        //           printf( "Nuevo valor de la papa: %d \n", m.valorPapa );
-        //         }
-        //       }
-        //       m.idParticipanteDeseado = ((partId - 1) + 1) % participantes + 1; //Se lo paso a la siguiente persona en forma circular.
-        //     }
-        //     if(m.idParticipanteDeseado == partId && !activo){ //Me pasan la papa, pero yo estoy inactivo
-        //       printf( "Participante %d esta inactivo. Se debe pasar la papa al participante siguiente\n", partId );
-        //       m.idParticipanteDeseado = ((partId - 1) + 1) % participantes + 1;
-        //     }
-
-        //     //Hora de mandar msj. Si yo no era el participante deseado, lo mantengo igual.
-        //     printf( "Envio la papa hacia el participante %d con el valor de papa: %d \n", m.idParticipanteDeseado, m.valorPapa );
-        //     msgsnd(id, &m, sizeof(int)*3, IPC_NOWAIT);
-        //     //Como es un circulo, cualquier i que gane y ponga valor negativo de la papa, lo pasara hacia la misma direccion y llegara hasta la persona i-1 en el respectivo modulo. Lo que significa que todos haran exit, y quedara 1 mensaje en la cola que se eliminara cuando se borre el buzon
-        //     if(m.valorPapa<0){//Si valor de la papa es negativo
-        //       printf( "VALOR NEGATIVO, ID: %d se sale \n", partId );
-        //       _exit( 0 );	//Juego termino, el proceso sale
-        //     }
-        //     usleep(100);
-        //   }
     
 }
-
 int main(int argc, char **argv)
 {
-
     int id, i, j, resultado;
-    //Setup para mensajes
-    //   id = msgget(IPC_PRIVATE, IPC_CREAT | 0600);
-    //   if (-1==id){
-    //     perror("msgget");
-    //     exit(1);
-    //   }
-    // if (argc > 1)
-    // {
-    //     participantes = atoi(argv[1]);
-    // }
-    // if (participantes <= 0)
-    // {
-    //     participantes = MAXPARTICIPANTES;
-    // } // Ya tenemos el num de participantes
-
-    //   struct msgbuff m;
     srand(time(NULL));
-    //Valores iniciales para que empieze el juego
-    //   m.mtype= 2028;
-    //  int idParticipanteDeseado = 9; //  Este es el participante que empieza.
-                                                           //   m.participantesActivos= participantes;
-                                                              //   printf( "Juego de la papa! \nEmpieza el participante %d \n", m.idParticipanteDeseado );
-    //Ver si mandaron segundo parametro para el valor de la papa
-    // if (argc > 2)
-    // {
-    //     valorPapa = atoi(argv[2]);
-    // }
-    valorPapa=rand()%10+1;                               // Ya tenemos el num de participantes
-    // int commsz;
+    
+    valorPapa=rand()%10+1;  
+    int receive;
+    int send=10;                             // Ya tenemos el num de participantes
     int myrank;
     MPI_Init(NULL, NULL);
     MPI_Comm_size(MPI_COMM_WORLD, &commsz);
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
+    //MPI ES THRASH 
+    // if(myrank==0){
+    //     int random=rand()%commsz;
+    //     printf("Huh\n");
+    //     MPI_Send(&send,1,MPI_INT,1,0,MPI_COMM_WORLD);
+    // }
+    // else{
+    //     MPI_Recv(&receive,1,MPI_INT,(myrank-1)%commsz,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+    //     printf("Soy: %d\n",myrank);
+    //     MPI_Send(&receive,1,MPI_INT,(myrank+2)%commsz,0,MPI_COMM_WORLD);
+    // }
+
+    
     participantesActivos=commsz;
     participanteInicial=rand()%commsz;
-    // participantes=commsz;
-    if(myrank==0){
-        printf("Inicial : %d\n",participanteInicial);
-        // idParticipanteDeseado = rand() % (commsz) + 1; //  Este es el participante que empieza.        // MPI_Send(&valorPapa,1,MPI_INT,idParticipanteDeseado,0,MPI_COMM_WORLD);
-        MPI_Send(&valorPapa,1,MPI_INT,1,0,MPI_COMM_WORLD);
-        MPI_Send(&participantesActivos,1,MPI_INT,1,0,MPI_COMM_WORLD);
+    int prev=participanteInicial==0?commsz-1:participanteInicial-1;
+    if(myrank==prev){
+        // printf("Inicial : %d\n",participanteInicial);
+        MPI_Send(&valorPapa,1,MPI_INT,participanteInicial,0,MPI_COMM_WORLD);
+        MPI_Send(&participantesActivos,1,MPI_INT,participanteInicial,0,MPI_COMM_WORLD);
     }
     participante(myrank);
     MPI_Finalize();

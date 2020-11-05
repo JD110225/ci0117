@@ -4,7 +4,7 @@
 const int MAXSTRING = 100;
 int main(void){
     char greeting[MAXSTRING];
-    int commsz=3;
+    int commsz;
     int myrank;
     MPI_Init(NULL, NULL);
     MPI_Comm_size(MPI_COMM_WORLD, &commsz);

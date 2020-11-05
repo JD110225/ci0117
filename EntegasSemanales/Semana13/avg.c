@@ -28,14 +28,35 @@ int** generarMatrizAleatoria(int size) {
     }
     return matriz;
 }
-int* alphaChadStrat(int** matriz,int size){
-  int* arraryRepresentation=(int*) malloc(size*size*sizeof(int));
+int* matrixToArray(int** matriz,int size,_Bool flag){
+  int* arrayRepresentation=(int*) malloc(size*size*sizeof(int));
   for(int f=0;f<size;++f){
     for(int c=0;c<size;++c){
-        arraryRepresentation[f*size+c]=matriz[f][c];
+        if(!flag){
+          arrayRepresentation[f*size+c]=matriz[f][c];
+        }
+        else{
+          arrayRepresentation[f*size+c]=matriz[c][f];
+        }
     }
   }
-  return arraryRepresentation;
+  return arrayRepresentation;
+}
+void verMatriz(int **matriz,int size){
+  for(int i=0;i<size;++i){
+    for(int j=0;j<size;++j){
+      printf("%d ",matriz[i][j]);
+    }
+    printf("\n");
+  }
+}
+void verMatrizTranspuesta(int **matriz,int size){
+  for(int i=0;i<size;++i){
+    for(int j=0;j<size;++j){
+      printf("%d ",matriz[j][i]);
+    }
+    printf("\n");
+  }
 }
 float compute_avg(float *array, int num_elements) {
   float sum = 0.f;
@@ -51,31 +72,56 @@ void viewArray(int* array,int size){
       }
       printf("\n");
 }
-
+void multiplicacionMatrices(int* a,int* b,int* resultado,int size){
+  for(int i=0;i<size*size;++i){
+    resultado[i]=0;
+    printf("aja...\n");
+    for(int j=0;j<size*size;++j){
+      resultado[i]+=a[i*size+j]*b[j];
+      printf("Resultado: %d\n",resultado[i]);
+    }
+  }
+}
 int main(int argc, char** argv) {
   srandom(time(0));
-  int size=3;
+  int size=2;
   int** m1 = generarMatrizAleatoria(size);
   int** m2 = generarMatrizAleatoria(size);
-  int *m1Array=alphaChadStrat(m1,size);
-  int *m2Array=alphaChadStrat(m2,size);
-  MPI_Init(NULL, NULL);
-  int world_rank;
-  int world_size;
-  MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-  if(world_rank==0){
-    viewArray(m1Array,size*size);
-    viewArray(m2Array,size*size);
-  }
-  int* subArray1=(int*)malloc(size*sizeof(int));
-  int* subArray2=(int*)malloc(size*sizeof(int));
-  MPI_Scatter(m1Array,size,MPI_INT,subArray1,size,MPI_INT,0,MPI_COMM_WORLD);
-  MPI_Scatter(m2Array,size,MPI_INT,subArray2,size,MPI_INT,0,MPI_COMM_WORLD);
+  verMatriz(m1,size);
+  printf("\n");
+  verMatriz(m2,size);
+  printf("\n");
+  printf("Matriz 1: \n");
+  int *m1Array=matrixToArray(m1,size,0);
+  int *m1Trans=matrixToArray(m1,size,1);
+  viewArray(m1Array,size*size);
+  printf("Matriz 2 \n");
+  // int *m2Array=matrixToArray(m2,size,0);
+  int *m2Trans=matrixToArray(m2,size,1);
+  viewArray(m2Trans,size*size);
+  // printf("\n");
+  // viewArray(m1Array,size*size);
+  // printf("\n");
+  // viewArray(m2Array,size*size);
+  // multiplicacionMatrices(m1Array,m2Array,result,size);
+  // viewArray(result,size*size);
+  // MPI_Init(NULL, NULL);
+  // int world_rank;
+  // int world_size;
+  // MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+  // MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+  // if(world_rank==0){
+  //   // viewArray(m1Array,size*size);
+  //   // viewArray(m2Array,size*size);
+  // }
+  // int* subArray1=(int*)malloc(size*sizeof(int));
+  // int* subArray2=(int*)malloc(size*sizeof(int));
+  // MPI_Scatter(m1Array,size,MPI_INT,subArray1,size,MPI_INT,0,MPI_COMM_WORLD);
+  // MPI_Scatter(m2Array,size,MPI_INT,subArray2,size,MPI_INT,0,MPI_COMM_WORLD);
 
-  printf("Process: %i\n",world_rank);
-  viewArray(subArray1,size);
-  viewArray(subArray2,size);
+  // printf("Process: %i\n",world_rank);
+  // viewArray(subArray1,size);
+  // viewArray(subArray2,size);
 
   // float *rand_nums =(float *)malloc(sizeof(float) * num_elements_per_proc*world_size);;
   // if (world_rank == 0) {
@@ -105,7 +151,7 @@ int main(int argc, char** argv) {
   // }
   // free(sub_avgs);
   // free(sub_rand_nums);
-  MPI_Finalize();
+  // MPI_Finalize();
 }
 
 

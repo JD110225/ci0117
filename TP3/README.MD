@@ -17,3 +17,8 @@ de asignar las muestras a las diferentes clases(clusters), luego para calcular e
 cercano de todos los puntos y por ultimo se generaron 3 hilos que corren el algoritmo principal
 de manera concurrente, cada hilo generara un resultado distinto(con eleccion aleatoria de clusters se obtendran diversos resultados) y la imagen final se generara
 con la solucion del hilo que tuvo la menor disimilaridad.   
+
+Analisis tiempos
+
+Con 100 puntos , no hay mejoras al crear hilos (el algorimto realmente no hace tantos calculos). En el caso de 1000,10000 y 100000, si existe una mejora en cuanto al speedup, sin embargo al crear mas de 4 threads, los tiempos de ejecucion en realidad no mejoran, esto muy
+posiblemente se debe a que estos calculos se hicieron desde una maquina virtual con solo dos cores

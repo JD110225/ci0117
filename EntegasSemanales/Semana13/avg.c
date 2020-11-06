@@ -1,24 +1,13 @@
-
-// Author: Wes Kendall
-// Copyright 2012 www.mpitutorial.com
-// This code is provided freely with the tutorials on mpitutorial.com. Feel
-// free to modify it for your own use. Any distribution of the code must
-// either provide a link to www.mpitutorial.com or keep this header intact.
-//
-// Program that computes the average of an array of elements in parallel using
-// MPI_Scatter and MPI_Allgather
-//
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <mpi.h>
 #include <assert.h>
-// Computes the average of an array of numbers
 int** generarMatrizAleatoria(int size) {
     // srand((int)time(0));
     int** matriz = (int**)malloc((size*size*sizeof(int)));
     for (int i = 0; i < size; ++i) {
-        matriz[i] = (int*)malloc((size*size*sizeof(int)));
+        matriz[i] = (int*)malloc((size*sizeof(int)));
     }
     for (int f = 0; f < size; ++f) {
         for (int c = 0; c < size; ++c) {
@@ -28,7 +17,7 @@ int** generarMatrizAleatoria(int size) {
     }
     return matriz;
 }
-int* matrixToArray(int** matriz,int size,_Bool flag){
+int* matrixToArray(int** matriz,int size,int flag){
   int* arrayRepresentation=(int*) malloc(size*size*sizeof(int));
   for(int f=0;f<size;++f){
     for(int c=0;c<size;++c){
@@ -36,11 +25,23 @@ int* matrixToArray(int** matriz,int size,_Bool flag){
           arrayRepresentation[f*size+c]=matriz[f][c];
         }
         else{
-          arrayRepresentation[f*size+c]=matriz[c][f];
+           arrayRepresentation[f*size+c]=matriz[c][f];
         }
     }
   }
   return arrayRepresentation;
+}
+int **arrayToMatrix(int *array,int size,int rows){
+  int **matriz=(int**)malloc(size*size*sizeof(int));
+  for (int i = 0; i < size; ++i) {
+      matriz[i] = (int*)malloc((size*sizeof(int)));
+  }
+  for(int i=0;i<size;++i){
+    for(int j=0;j<size;++j){
+      matriz[i][j]=array[i*size+j];
+    }
+  }
+  return matriz;
 }
 void verMatriz(int **matriz,int size){
   for(int i=0;i<size;++i){
@@ -50,67 +51,81 @@ void verMatriz(int **matriz,int size){
     printf("\n");
   }
 }
-void verMatrizTranspuesta(int **matriz,int size){
-  for(int i=0;i<size;++i){
-    for(int j=0;j<size;++j){
-      printf("%d ",matriz[j][i]);
-    }
-    printf("\n");
-  }
-}
-float compute_avg(float *array, int num_elements) {
-  float sum = 0.f;
-  int i;
-  for (i = 0; i < num_elements; i++) {
-    sum += array[i];
-  }
-  return sum / num_elements;
-}
+// void verMatrizTranspuesta(int **matriz,int size){
+//   for(int i=0;i<size;++i){
+//     for(int j=0;j<size;++j){
+//       printf("%d ",matriz[j][i]);
+//     }
+//     printf("\n");
+//   }
+// }
+// float compute_avg(float *array, int num_elements) {
+//   float sum = 0.f;
+//   int i;
+//   for (i = 0; i < num_elements; i++) {
+//     sum += array[i];
+//   }
+//   return sum / num_elements;
+// }
 void viewArray(int* array,int size){
       for(int i=0;i<size;++i){
             printf("%d ",array[i]);
       }
       printf("\n");
 }
-void multiplicacionMatrices(int* a,int* b,int* resultado,int size){
-  for(int i=0;i<size*size;++i){
-    resultado[i]=0;
-    printf("aja...\n");
-    for(int j=0;j<size*size;++j){
-      resultado[i]+=a[i*size+j]*b[j];
-      printf("Resultado: %d\n",resultado[i]);
-    }
-  }
-}
+//m[i][j]=array[i*n+j]
+//Probably wrong, usar matriz*vector del libro...
+// void multiplicacionMatrices(int* a,int* b,int* resultado,int size){
+//   for(int i=0;i<size;++i){
+//     for(int j=0;j<size;++j){
+//       resultado[i*size+j]=0;
+//       for(int k=0;k<size;++k){
+//         resultado[i*size+j]+=a[i*size+k]*b[k*size+j];
+//       }
+//     }
+//   }
+// }
 int main(int argc, char** argv) {
   srandom(time(0));
-  int size=2;
+  int size=3;
   int** m1 = generarMatrizAleatoria(size);
   int** m2 = generarMatrizAleatoria(size);
-  verMatriz(m1,size);
-  printf("\n");
-  verMatriz(m2,size);
-  printf("\n");
-  printf("Matriz 1: \n");
-  int *m1Array=matrixToArray(m1,size,0);
-  int *m1Trans=matrixToArray(m1,size,1);
-  viewArray(m1Array,size*size);
-  printf("Matriz 2 \n");
-  // int *m2Array=matrixToArray(m2,size,0);
-  int *m2Trans=matrixToArray(m2,size,1);
-  viewArray(m2Trans,size*size);
+  // int* resultado=(int*)malloc(size*size*sizeof(int));
+  // verMatriz(m1,size);
   // printf("\n");
+  // verMatriz(m2,size);
+  // printf("\n");
+  // int *m1Array=matrixToArray(m1,size,0);
+  int *m2Array=matrixToArray(m2,size,1);
+  // multiplicacionMatrices(m1Array,m2Array,resultado,size);
+  // printf("Matriz 1 to array: \n");
   // viewArray(m1Array,size*size);
-  // printf("\n");
+  // printf("Matriz 2 to array: \n");
   // viewArray(m2Array,size*size);
-  // multiplicacionMatrices(m1Array,m2Array,result,size);
-  // viewArray(result,size*size);
-  // MPI_Init(NULL, NULL);
-  // int world_rank;
-  // int world_size;
-  // MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-  // MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-  // if(world_rank==0){
+  // printf("Resultado : \n");
+  // int** resultMatrix=arrayToMatrix(resultado,size,size);
+  // verMatriz(resultMatrix,size);
+
+  MPI_Init(NULL, NULL);
+  int rank;
+  int s;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &s);
+  int* subArray1=(int*)malloc(size*sizeof(int));
+  int* subArray2=(int*)malloc(size*sizeof(int));
+  if(rank==0){
+    // viewArray(m1Array,size*size);
+    // viewArray(m2Array,size*size);
+  }
+  // MPI_Bcast(m1Array,size*size,MPI_INT,0,MPI_COMM_WORLD);
+  MPI_Scatter(m2Array,size,MPI_INT,subArray2,size,MPI_INT,0,MPI_COMM_WORLD);
+  printf("Rank %d \n",rank);
+  // viewArray(subArray1,size);
+  // viewArray(subArray2,size);
+  int* subResult=(int*)malloc(size*sizeof(int));
+  // multiplicacionMatrices(subArray1,subArray2,subResult,size);
+  // printf("Rank %d \n",rank);
+  // viewArray(subResult,size);
   //   // viewArray(m1Array,size*size);
   //   // viewArray(m2Array,size*size);
   // }
@@ -151,7 +166,7 @@ int main(int argc, char** argv) {
   // }
   // free(sub_avgs);
   // free(sub_rand_nums);
-  // MPI_Finalize();
+  MPI_Finalize();
 }
 
 

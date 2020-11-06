@@ -8,7 +8,8 @@ se genere la imagen en formato eps. Si el tercer parametro no se especifica, la 
 Estrategia de asignacion de puntos a clases
 
 La primera estrategia es totalmente aleatoria (el profesor la programo) y la segunda 
-corresponde en asignar de manera equitativa las muestras a cada clusters. Si por ejemplo se requiere trabajar con 15 muestras y 5 clusters, las primeras 3 muestras irian al primer cluster, las segundas 3 al segundo cluster etc... Si la cantidad de muestras no es un multiplo de la cantidad de clusters (e.g: 10 y 3), se le asigna a cada cluster un total de (muestras/clusters + 1) elementos y al ultimo cluster las muestras restantes.
+corresponde en asignar de manera equitativa las muestras a cada clusters. Si por ejemplo se requiere trabajar con 15 muestras y 5 clusters, las primeras 3 muestras irian al primer cluster, las segundas 3 al segundo cluster etc... Si la cantidad de muestras no es un multiplo de la cantidad de clusters (e.g: 10 y 3), se le asigna a cada cluster un total de (muestras/clusters + 1) elementos y al ultimo cluster las muestras restantes. En el metodo asignarPuntosAClases(llamado en linea 120 de medios.cc), se puede especificar en el segundo
+parametro la estrategia que se desee utilizar
 
 Uso de OMP
 

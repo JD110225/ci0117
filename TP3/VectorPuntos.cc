@@ -25,7 +25,7 @@ VectorPuntos::VectorPuntos(){
 **/
 VectorPuntos::VectorPuntos( long cantidad, double radio ) {
    long punto;
-   double angulo, r,x,y;
+   double angulo, r,x,y,z;
    srand(time(NULL));
    this->elementos = cantidad;
    this->bloque = (Punto **) calloc( sizeof( Punto *), cantidad );
@@ -34,8 +34,8 @@ VectorPuntos::VectorPuntos( long cantidad, double radio ) {
       r = randf( radio );
       x = r * cos( angulo );
       y = r * sin( angulo );
-
-      this->bloque[ punto ] = new Punto( x, y );
+      z=randf(2* M_PI); // genera un z random
+      this->bloque[ punto ] = new Punto( x, y, z );
    }
 
 }
@@ -51,7 +51,7 @@ VectorPuntos::VectorPuntos( long cantidad ) {
    this->elementos = cantidad;
    this->bloque = (Punto **) calloc( sizeof( Punto *), cantidad );
    for ( elemento = 0; elemento < cantidad; elemento++ ) {
-      bloque[ elemento ] = new Punto( 0, 0 );
+      bloque[ elemento ] = new Punto( 0, 0 ,0);
    }
 
 }
@@ -105,18 +105,26 @@ long VectorPuntos::demeTamano() {
 // Encuentra el promedio de los puntos en un cluster particular...retorna un
 // punto cuyos valores "x" y "y" son los promedios de los valores "x" y "y"
 // de todos los puntos en el cluster.  
-Punto* VectorPuntos::findMean(int cluster,long* vectorClases,int cantidadEnCluster){
+Punto* VectorPuntos::findMean(int cluster,long* vectorClases,int cantidadEnCluster,int dim){
    double sumaX=0;
    double sumaY=0;
+   double sumaZ=0;
    for(int i=0;i<this->elementos;++i){
       if(vectorClases[i]==cluster){
          sumaX+=bloque[i]->demeX();
          sumaY+=bloque[i]->demeY();
+         if(dim==3){
+            sumaZ+=bloque[i]->demeZ();
+         }
       }
    }
    sumaX/=cantidadEnCluster;
    sumaY/=cantidadEnCluster;
    Punto* p=new Punto(sumaX,sumaY);
+   if(dim==3){
+      sumaZ/=cantidadEnCluster;
+   }
+   p=new Punto(sumaX,sumaY,sumaZ);
    return p;
 }
 /**
@@ -137,7 +145,6 @@ long VectorPuntos::masCercano( Punto * punto ) {
          posicion = elemento;
       }
    }
-
    return posicion;
 
 }

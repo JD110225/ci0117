@@ -18,6 +18,7 @@
 using namespace std;
 #define PUNTOS 100000
 #define CLASES 17
+#define dim 2
 #define defaultFileName "resultado.eps"   //Nombre default donde guardar el archivo .eps
 long casillas = CLASES;   //valor default
 long muestras = PUNTOS;    //valor default
@@ -112,20 +113,22 @@ int main( int cantidad, char ** parametros ) {
    long bestClases[muestras];
    double menorDisimilaridad=__DBL_MAX__;
    //Iniciar a contar el tiempo
+   double disimilaridad;
    double inicio=omp_get_wtime();
-   #pragma omp parallel for num_threads(3)
+   // #pragma omp parallel for num_threads(3) 
    for(int i=0;i<3;++i){
       asignarPuntosAClases( clases,0);	// Asigna los puntos a las clases establecidas
       do {
       // Coloca todos los centros en el origen
       // Promedia los elementos del conjunto para determinar el nuevo centro
       for(int i=0;i<casillas;++i){
-         Punto* p=(puntos.findMean(i,clases,contarElementos(clases,i)));
+         Punto* p=(puntos.findMean(i,clases,contarElementos(clases,i),dim));
          centros.change(i,p);
       }
          cambios = 0;	// Almacena la cantidad de puntos que cambiaron de conjunto
       // Cambia la clase de cada punto al centro más cercano
-      #pragma omp parallel for num_threads(4)
+      #pragma omp parallel for num_threads(4) \
+      reduction(+:cambios)
       for(int i=0;i<muestras;++i){
          int index=centros.masCercano(puntos[i]);
          if(clases[i]!=index){
@@ -135,7 +138,7 @@ int main( int cantidad, char ** parametros ) {
       }
          totalCambios += cambios;
       } while ( cambios > 0 );	// Si no hay cambios el algoritmo converge
-      double disimilaridad=centros.disimilaridad( &puntos, clases );
+      disimilaridad=centros.disimilaridad( &puntos, clases );
       printf( "Valor de la disimilaridad en la solución encontrada %g, con un total de %ld cambios\n", disimilaridad, totalCambios );
       if(disimilaridad<menorDisimilaridad){
          menorDisimilaridad=disimilaridad;

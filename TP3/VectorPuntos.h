@@ -23,7 +23,7 @@ class VectorPuntos {
       void swap(int,int);
       Punto * operator [] ( long );
       void display();
-      Punto* findMean(int cluster,long* vectorClases,int cantidadEnClusters);
+      Punto* findMean(int cluster,long* vectorClases,int cantidadEnClusters,int dim);
    private:
       long elementos;
       Punto ** bloque;

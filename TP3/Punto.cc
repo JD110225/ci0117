@@ -48,7 +48,11 @@ double Punto::demeY() {
    return this->y;
 
 }
+double Punto::demeZ() {
 
+   return this->z;
+
+}
 /**
  *  Cambia el valor de las coordenadas(no se utilizo)
 **/
@@ -76,8 +80,18 @@ double Punto::dist2( Punto * otro ) {
    return resultado;
 
 }
+/* Calcula la distancia entre dos puntos en tercera dimension */
+double Punto::dist3( Punto * otro ) {
+   double dx = this->x - otro->x;
+   double dy = this->y - otro->y;
+   double dz= this->z - otro->z;
+   double resultado;
 
+   resultado = dx * dx + dy * dy+ dz * dz;
 
+   return resultado;
+
+}
 /**
  *  Suma desplazamientos a un punto
 **/
@@ -106,7 +120,7 @@ void Punto::divida( double div ) {
  *  Despliega la información de un punto
 **/
 void Punto::ver() {
-   printf("(x: %f,y: %f)\n",this->x,this->y);
+   printf("(x: %f,y: %f z: %f)\n",this->x,this->y,this->z);
    // std::string disp;
 
    // disp = "[ " + std::to_string( this->x ) + ", " + std::to_string( this->y ) + ", " + std::to_string( this->z ) + " ]";

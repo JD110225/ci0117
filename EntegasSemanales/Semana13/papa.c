@@ -67,7 +67,7 @@ int participante(int partId)
                 printf("Quedan %d participantes \n",participantesActivos);
             }
             activo=false;
-            valorPapa=rand()%10+1;
+            valorPapa=10;
         }
     }
     else if(valorPapa!=-1){
@@ -86,7 +86,6 @@ int main(int argc, char **argv)
 {
     int id, i, j, resultado;
     srand(time(NULL));
-    
     valorPapa=rand()%10+1;  
     int receive;
     int send=10;                             // Ya tenemos el num de participantes
@@ -94,6 +93,7 @@ int main(int argc, char **argv)
     MPI_Init(NULL, NULL);
     MPI_Comm_size(MPI_COMM_WORLD, &commsz);
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    // srand(time(NULL)+myrank);
 
     //MPI ES THRASH 
     // if(myrank==0){

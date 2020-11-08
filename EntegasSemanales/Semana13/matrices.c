@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <mpi.h>
+#define sizeDefault 4
 int** generarMatrizAleatoria(int size) {
     // srand((int)time(0));
     int** matriz = (int**)malloc((size*size*sizeof(int)));
@@ -75,15 +76,17 @@ int* multMatrizVector(int** matriz,int *vector,int size){
 }
 int main(int argc, char** argv) {
   srandom(time(0));
-  int size=3;
+  int size=sizeDefault;
   int** m1 = generarMatrizAleatoria(size);
   int** m2 = generarMatrizAleatoria(size);
   int *m1Array=matrixToArray(m1,size);
+  double start,end;
   MPI_Init(NULL, NULL);
   int rank;
   int s;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &s);
+  start=MPI_Wtime();
   int* subArray=(int*)malloc(size*sizeof(int));
   MPI_Scatter(m1Array,size,MPI_INT,subArray,size,MPI_INT,0,MPI_COMM_WORLD);
   int* subresult=multMatrizVector(m2,subArray,size);
@@ -99,6 +102,10 @@ int main(int argc, char** argv) {
     int** resultado=arrayToMatrix(m,size);
     printf("Matriz resultado: \n");
     verMatriz(resultado,size);
+  }
+  end=MPI_Wtime();
+  if(rank==0){
+    printf("Time spent: %f\n",end-start);
   }
   MPI_Finalize();
 }

@@ -2,8 +2,7 @@
 # CI0117 Programación Paralela y Concurrente
 # Grupos 2 y 3
 # Makefile for TCP example
-
-all: server.out client.out ipv4-test.out
+all: server.out client.out ipv4-test.out cli-test.out
 
 %.o: %.cc
 	g++ -g -c $<
@@ -28,4 +27,12 @@ server.out: server.o
 
 clean:
 	rm -f *.o *.out
-
+# all: server.out client-test.out ipv4-test.out client.out
+# client-test.out: cli-test.cc Socket.cc
+# 	g++ -g cli-test.cc Socket.cc -o client-test.out
+# ipv4-test.out: ipv4-test.cc Socket.cc
+# 	g++ -g ipv4-test.cc Socket.cc -o ipv4-test.out
+# server.out: server.c
+# 	gcc -g server.c -o server.out
+# client.out: client.c
+# 	gcc -g client.c -o client.out

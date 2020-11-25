@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "Socket.h"
 Socket::Socket(int a, int boolValue){
     if ((this->socketID = socket(AF_INET, SOCK_STREAM, boolValue)) < 0) 
@@ -41,12 +42,34 @@ int Socket::Read(void* buffer,int sizeBuffer){
 int Socket::Write(void* request,int requestLength){
     write(socketID,request,requestLength);
 }
-int Socket::Listen(int a){
-
+int Socket::Listen(int server){
+    int val=0;
+   if (listen(server, 3) < 0) 
+    { 
+        perror("Error en listen"); 
+        exit(0); 
+    } 
+    return val;
 }
-int Socket::Bind(int a){
+int Socket::Bind(int server){
+    struct sockaddr_in address; 
+    address.sin_family = AF_INET; 
+    address.sin_addr.s_addr = INADDR_ANY; 
+    address.sin_port = htons( PORT ); 
+    if (bind(server, (struct sockaddr *)&address,  
+                                 sizeof(address))<0) 
+    { 
+        perror("Error en bind"); 
+        exit(0); 
+    }  
 
 }
 Socket* Socket::Accept(){
-
+    Socket* nuevoSocket=new Socket(20);
+    // if ((nuevoSocket = accept(server_fd, (struct sockaddr *)&address,  
+    //                    (socklen_t*)&addrlen))<0) 
+    // { 
+    //     perror("accept"); 
+    //     exit(EXIT_FAILURE); 
+    // } 
 }

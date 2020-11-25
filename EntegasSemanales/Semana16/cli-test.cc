@@ -10,14 +10,15 @@
 #include "Socket.h"
 
 int main( int argc, char * argv[] ) {
-   char * miCompu = (char *) "xx.xx.xx.xx";	// Utilizar una dirección de su red
+   char * miCompu = (char *) "10.0.2.15";	// Utilizar una dirección de su red
    char * request = (char *) "Mensaje del cliente PPC 2020/Nov";
-
+   printf("Hello w\n");
    Socket s( 's', false );	// Create a new stream socket for IPv4
    char a[ 1024 ];
 
    memset( a, 0 , 1024 );
-   s.Connect( miCompu, 9876 );	// Debe coincider con el puerto del servidor
+   //s.Connect( miCompu, 9876 );	// Debe coincider con el puerto del servidor
+   s.Connect( miCompu, 80 );	// Debe coincider con el puerto del servidor   
    s.Write(  (char * ) request, strlen( request ) );
    s.Read( a, 1024 );
    printf( "%s\n", a);

@@ -16,7 +16,6 @@ int main( int argc, char * argv[] ) {
    Socket s( 's', false );	// Create a new stream socket for IPv4
    // Socket s=Socket(15);
    char a[ 1024 ];
-
    memset( a, 0 , 1024 );
    s.Connect( os, 80 );
    s.Write(  (char * ) request, strlen( request ) );

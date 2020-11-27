@@ -15,6 +15,7 @@
 class Socket{
 
    public:
+      Socket();
       Socket( int, int );
       Socket( int );
       ~Socket();

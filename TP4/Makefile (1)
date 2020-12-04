@@ -1,0 +1,20 @@
+# Makefile para primer examen parcial
+# CI-0117 Programacion concurrente
+# Grupo 2
+#
+
+all: sequences.out lcs.out
+
+%.o: %.cc
+	g++ -g -c $<
+
+%.o: %.c
+	gcc -g -c $<
+
+sequences.out: sequences.o adn.o
+	g++ -g sequences.o adn.o -o sequences.out
+lcs.out: lcs.cc
+	mpiCC lcs.cc -g -o lcs.out
+clean:
+	rm -f *.o *.out
+
